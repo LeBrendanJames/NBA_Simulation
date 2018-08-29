@@ -8,6 +8,32 @@
 #include <string>
 #include <iostream>
 
+bool getDataFromDB(PGconn * conn, DBReq * req, DBRes * res){
+	// Build query string from DBReq object
+	std::string queryStr = "SELECT ";
+	for (int i = 0; i < req->cols.size(); i++){
+		// Add cols to select 
+		queryStr += req->cols[i] + ", ";
+	}
+	queryStr += "FROM " + req->tables[0];
+	// Joins
+	// where
+	// group by
+	// having
+	
+	// Execute query & error check
+	PGresult * selectResult = PQexec(conn, queryStr.c_str());
+	
+	// Place result in DBRes object
+	// if result is a single number then
+	// else if result is just one row then
+	// else
+		// make a 2D array
+	
+	// Return
+	return true;
+}
+
 
 bool getPlayerTotalPoints(PGconn * conn, char * resStr, int playerID, struct tm * startDate, struct tm * endDate){
     std::string queryString = "SELECT SUM(points) FROM pbp WHERE result = 'made' AND player = ";
@@ -26,6 +52,18 @@ bool getTeamPossessionCount(PGconn * conn, char * resultString, std::string team
     std::string queryString = "SELECT COUNT(";
 
     return true;
+}
+
+bool getPlayerMins(){
+	
+	
+	
+	if(!getDataFromDB()){
+		// Error Handling done at top level?
+		return false;
+	}
+	
+	return true;
 }
 
 

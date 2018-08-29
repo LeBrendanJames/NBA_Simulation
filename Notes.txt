@@ -77,3 +77,36 @@ How do you do this? Don't worry about code for now - this is more of a statistic
                                                 Could do for player on possession-by-possession basis?
 
                                                 Then, could look at if the coefficients for each factor are consistent across players, or if they are consistent across a subset of players with something in common (position/age/etc.)
+												
+												
+		
+		
+Questions from a code perspective:
+	When will I need to reach into database?
+		1. When initializing players?
+			Just in a player's constructor, right?
+			call setAdvStats()
+		2. When initializing lineups?
+		-- It will only be one of the above two that are needed, depending on how sophisticated the code gets.
+		-- I can initially start with players then just transfer that code over to lineups when I start handling simulation based on lineups
+		
+		
+So, plan is to move where the database calls come from, depending on how sophisticated the code gets:
+	1. First, it will just be one simple function when a player is initialized
+	2. Next, it will be a call for an entire lineup, and player initialization will consist of almost nothing
+		-- Or, player initialization will still do something and lineup information will make adjustments to that...
+	3. Third, it will incorporate both lineups (team & opponent), so database code will be moved 'up' to an 'onCourtPlayers' object which holds two lineups 
+	4. Fourth, it will incorporate game state, moving code up once again to a 'game' or 'gameState' object
+	5. Fifth, it will incorporate coaches, which will just be an addition to the 'game' or 'gameState' object
+	6. Other additions will come, all of which will be added to the 'game'/'gameState' object 
+	
+Figuring out the totals/stats by lineup will similarly move 'up' levels
+	1. When info is pulled per player, lineup stat breakdowns will be constructed at the 'lineup' object level
+	2. Next, when lineup interaction effects are taken into account, we will just modify the code at the lineup level
+	3. Next, when team and opponent lineups are involved, we will move up a level and determine stats at the 'onCourtPlayers' level
+	4. Finally, it will move up to where everything is done at the 'gameState' level 
+	
+	
+	
+
+		
