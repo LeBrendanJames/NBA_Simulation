@@ -1,0 +1,79 @@
+Given 5 players on court, find percentage chance of what's going to happen
+
+                Ignore opponent for now - can be added in later
+
+               
+
+               
+
+How do you do this? Don't worry about code for now - this is more of a statistics question
+
+                Obviously, there are some simple ways to do this (like just adding USG and adjusting proportional so that total = 100% or whatever)
+
+                                This may be a good starting point, just to get something up and working
+
+               
+
+                More complex may include looking at ball-handling duties, and seeing if different players will have different rates of giving up usage based on other players on the floor
+
+                                Some point guards probably jack up the same # of shots regardless of teammates (Russell Westbrook, etc.)
+
+               
+
+                                This could also be done by play type, as some play types (catch-and-shoot, etc.) are dependent of teammate actions
+
+                               
+
+                               
+
+                               
+
+                More and more complexity can be added from this starting point
+
+                                1. Opponents
+
+                                2. Game state
+
+                                                - Which can include all sorts of stuff beyond score/time/home-away, including player time on court, player fouls, etc.
+
+                                3. More advanced analysis of past tendencies
+
+                                                - List here is endless
+
+                                4. Stuff outside the game
+
+                                                - Travel being the most obvious
+
+                                               
+
+                                               
+
+                                               
+
+               
+
+                All of these improvements should only be implemented with backtesting/out-of-sample confirmation
+
+                                Basically, implementing the change should produce more accurate estimates, whether that be point spreads or individual player stats
+
+                                This full backtesting may be difficult to do for a while, so the first couple improvements can stay with theoretical backing even if they don't improve estimates              
+
+                                                A correct change could actually hurt estimates in the beginning if the rest of the model is terrible
+
+                                               
+
+                                **There's two aspects of this (dubbed 'player' and 'coach' in the Hbob ESPN article) that I should be able to backtest**
+
+                                                The 'player' should look at lineup vs lineup. So take a 5-man lineup and simulate it against a bunch of other 5-man lineups and check that the stats look good
+
+                                                The 'coach' aspect should implement rotations as well
+
+                                               
+
+                                               
+
+                                Another option is to run regressions (Find player USG based on a ton of factors, for example), but I wonder if sample sizes are too small or if there is a risk of data-mining here?
+
+                                                Could do for player on possession-by-possession basis?
+
+                                                Then, could look at if the coefficients for each factor are consistent across players, or if they are consistent across a subset of players with something in common (position/age/etc.)
