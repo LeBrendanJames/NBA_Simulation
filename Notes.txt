@@ -109,4 +109,37 @@ Figuring out the totals/stats by lineup will similarly move 'up' levels
 	
 	
 
+	
+	
+	
+Database implementation notes:
+I want to split 'business logic' and underlying database access.
+In this case, database access is read-only, so it's fairly simple in that sense. There are still, however, a large number of different ways I'd like to get data from the database.
+Define 'business logic' as anything that is a calculation pertaining to what is supposed to happen.
+Define 'database interaction' as anything where I would like a simgle number or group of numbers returned.
+
+
+
+
+
+
+
+Layers:
+
+
+Player/Lineup/all other 'business logic' classes
+Class dbInterface (includes opening/closing the database, as well as access procedures that take in a DBReq object)
+Database itself
+
+
+The business logic classes will only make calls to procedures in the dbInterface class 
+Some links on this:
+https://en.wikipedia.org/wiki/Data_access_layer
+https://www.codeproject.com/Articles/445231/The-Data-Access-Layer-Part-The-Basics-And-When-T - The textbook example discussed is basically what I'm going for
+https://softwareengineering.stackexchange.com/questions/257282/organise-c-classes-around-sql-database
+https://softwareengineering.stackexchange.com/questions/197272/best-practice-for-creating-a-global-config-class-used-by-numerous-components
+https://en.wikipedia.org/wiki/Dependency_injection
+https://softwareengineering.stackexchange.com/questions/156481/how-should-i-encapsulate-database-access
+https://stackoverflow.com/questions/15808430/where-should-i-declare-a-database-object
+https://stackoverflow.com/questions/14616751/oop-proper-class-design-for-database-connection-in-derived-child-class 
 		
