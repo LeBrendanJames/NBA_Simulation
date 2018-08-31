@@ -141,5 +141,10 @@ https://softwareengineering.stackexchange.com/questions/197272/best-practice-for
 https://en.wikipedia.org/wiki/Dependency_injection
 https://softwareengineering.stackexchange.com/questions/156481/how-should-i-encapsulate-database-access
 https://stackoverflow.com/questions/15808430/where-should-i-declare-a-database-object
-https://stackoverflow.com/questions/14616751/oop-proper-class-design-for-database-connection-in-derived-child-class 
+https://stackoverflow.com/questions/14616751/oop-proper-class-design-for-database-connection-in-derived-child-class
+
+
+Dynamically building queries:
+https://www.codeproject.com/Articles/13419/SelectQueryBuilder-Building-complex-and-flexible-S
+ 
 		

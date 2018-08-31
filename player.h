@@ -6,19 +6,23 @@
 #define SIMULATION_PLAYER_H
 
 #include "database.h"
+#include "dbReq.h"
 #include <ctime>
+#include <string>
 
 Class Player {
 	private:
 		// Constructors
-		Player();
-		Player(int pID);
-		Player(int pID, struct tm * startDate, struct tm * endDate);
+		Player(dbInterface * db);
+		Player(dbInterface * db, int pID);
+		Player(dbInterface * db, int pID, struct tm * startDate, struct tm * endDate);
 	
 		int playerID;
 		
 		struct tm * startDate;
 		struct tm * endDate;
+		
+		dbInterface * db;
 	
 		float shootPct;
 		float tovPct;

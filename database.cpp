@@ -4,9 +4,28 @@
 
 #include "database.h"
 #include <ctime>
-#include <libpq-fe.h>
+//#include <libpq-fe.h>
 #include <string>
 #include <iostream>
+
+
+
+bool DBInterface::getData(DBReq * req, DBRes * res){
+	// Build query here
+	std::string queryStr = "SELECT ";
+	
+	
+	
+	// query DB 
+	PGresult * selectResult = PQexec(conn, queryStr.c_str());
+	
+	// Place results into res
+	
+	
+	return true;
+}
+
+/*
 
 bool getDataFromDB(PGconn * conn, DBReq * req, DBRes * res){
 	// Build query string from DBReq object
@@ -66,4 +85,4 @@ bool getPlayerMins(){
 	return true;
 }
 
-
+*/
