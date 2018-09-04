@@ -4,16 +4,96 @@
 
 #include "database.h"
 #include <ctime>
-//#include <libpq-fe.h>
 #include <string>
 #include <iostream>
 
+// Map of categories to database tables
+// Categories are submitted by all upstream code, and are translated into tables and cols here
+// This makes it easy to change underlying database structure without having to change any upstream code
+std::string statCategories[5] = {"minutes", "FGA", "FGM", "3PA", "3PM"};
+std::string tableNames[5] = {"pbp", "pbp", "pbp", "pbp", "pbp"};
+std::string colNames[5] = {"elapsed time", "shot", "shot", "shot", "shot"};
+std::string constraintCategories[5] = {"something here"};
+std::string constraintNames[5] = {"something here"};
+
+// Default constructor
+DBInterface::DBInterface(){
+	conn = PQconnectdb("user=postgres dbname=nba_db password=superSecretPassword");
+}
+
+// Destructor
+DBInterface::~DBInterface() {
+	PQfinish(conn);
+}
 
 
 bool DBInterface::getData(DBReq * req, DBRes * res){
 	// Build query here
 	std::string queryStr = "SELECT ";
-	
+
+	for (int i = 0; i < req->getNumCategories(); i++) {
+        int j = 0;
+        while (req->getCategory(i) !=statCategories[j]) {
+            j++;
+        }
+        // check that they have found a match here, and add category to SQL
+        if (req->getCategory(i) == statCategories[j]){
+            queryStr += colNames[j];
+            queryStr += ' ';
+            // **Update 'fromStr' in here, with joining? 'joinStr' **
+        }
+    }
+
+    queryStr += "FROM pbp "; // **Temp measure, since everything I'm selecting comes from pbp**
+
+    /*
+	// First table should be automatically included, then any others must be (inner?) joined on
+	std::vector<std::string> tablesUsed;
+	for (int i = 0; i < req->getNumCategories(); i++){
+        int j = 0;
+        while (req->getCategory(i) != statCategories[j]) {
+            j++;
+        }
+        // check that they have found a match here, and add category to SQL
+        if (req->getCategory(i) == statCategories[j]){
+            bool prevIncl = false;
+            for (int k = 0; k < tablesUsed.size(); k++){
+                if (tableNames[j] == tablesUsed[k]){
+                    prevIncl = true;
+                }
+            }
+            if (!prevIncl) {
+                // JOIN
+            }
+        }
+	}*/
+
+
+    // Joins
+
+    // where
+    std::string whereStr;
+    whereStr += "WHERE ";
+    for (int i = 0; i < req->getNumConstraints(); i++){
+        int j = 0;
+        while (req->getConstraint(i)->getConstraintType() != constraintCategories[j]) {
+            j++;
+        }
+        // check that they have found a match here, and add category to SQL
+        if (req->getConstraint(i)->getConstraintType() == constraintCategories[j]){
+            whereStr += constraintNames[j];
+            whereStr += " = ";
+            whereStr += req->getConstraint(i)->getConstraintNum();
+        }
+    }
+    queryStr += whereStr;
+
+    // group by (** This will have to be refined as I have SELECT statments that aren't grouped by player**)
+    std::string groupStr;
+    groupStr += "GROUP BY player_id ";
+    queryStr += groupStr;
+
+    // having
 	
 	
 	// query DB 

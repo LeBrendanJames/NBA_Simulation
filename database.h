@@ -12,35 +12,63 @@
 #include <string>
 #include <vector>
 
+class Constraint{
+private:
+    std::string constraintType;
+    int constraintNum;
+    struct tm constraintDate;
+public:
+    std::string getConstraintType();
+    int getConstraintNum();
+};
 
-Class DBReq {
-	// Vector of playerID's 
-	// Vector of categories to pull (will be written in bball terms, so will have to translate to table columns in DAL - should be easy with a hard-coded translation map)
-	// Vector of constraints (Same deal - will have to translate to actual table & column names)
+class DBReq {
+private:
+	// Vector of playerID's
+    std::vector<int> pIDs;
+
+    // Vector of categories to pull
+    // (will be written in bball terms, so will have to translate to table columns in DAL -
+    // should be easy with a hard-coded translation map)
+	std::vector<std::string> categories;
+
+    // Vector of constraints (Same deal - will have to translate to actual table & column names)
+    std::vector<Constraint*> constraints;
+
+public:
+    std::string getCategory(int);
+    Constraint* getConstraint(int);
+    int getNumCategories();
+    int getNumConstraints();
 };
 
 
-Class PlayerRes{
+class PlayerRes{
+private:
 	// PlayerID
 	int pID;
 	
 	// Vector of response values
+    std::vector<float> resVals;
+
+public:
 	
 };
 
-Class DBRes {
+class DBRes {
 	// Vector of pointers to playerResponse objects?
 		// Player response objects contain playerID and vector of response values? **Class PlayerRes**
 		// How do I handle the type of the response? Will it always be int or float? Probably float, since that's still fine for ints
-		
+	std::vector<PlayerRes*> playerRes;
+
 	// Can just create with the first vector, then create response objects as I go?
 };
 
 
-Class DBInterface{
+class DBInterface{
 	
 	private:
-		PGConn * conn;
+		PGconn * conn;
 
 	
 	public:

@@ -10,19 +10,19 @@
 #include <ctime>
 #include <string>
 
-Class Player {
+class Player {
 	private:
 		// Constructors
-		Player(dbInterface * db);
-		Player(dbInterface * db, int pID);
-		Player(dbInterface * db, int pID, struct tm * startDate, struct tm * endDate);
+		Player(DBInterface * db);
+		Player(DBInterface * db, int pID);
+		Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate);
 	
 		int playerID;
 		
 		struct tm * startDate;
 		struct tm * endDate;
 		
-		dbInterface * db;
+		DBInterface * db;
 	
 		float shootPct;
 		float tovPct;

@@ -5,8 +5,18 @@
 #include "player.h"
 
 
+
+void setDate(struct tm * date, int day, int month, int year){
+	date->tm_mday = day; // Day
+	date->tm_mon = month - 1; // Months since January
+	date->tm_year = year - 1900; // Years since 1900
+
+	return;
+}
+
+
 // Default constructor
-Player::Player(dbInterface * db){
+Player::Player(DBInterface * db){
 	this->db = db;
 	
 	playerID = 0;
@@ -20,7 +30,7 @@ Player::Player(dbInterface * db){
 	
 }
 
-Player::Player(dbInterface * db, int pID){
+Player::Player(DBInterface * db, int pID){
 	this->db = db;
 	playerID = pID;
 	
@@ -31,7 +41,7 @@ Player::Player(dbInterface * db, int pID){
 	setDate(endDate, 1, 1, 3000);
 }
 
-Player::Player(dbInterface * db, int pID, struct tm * startDate, struct tm * endDate){
+Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate){
 	this->db = db;
 	playerID = pID;
 	this->startDate = startDate;
@@ -42,13 +52,7 @@ Player::Player(dbInterface * db, int pID, struct tm * startDate, struct tm * end
 
 
 
-void setDate(struct tm * date, int day, int month, int year){
-	date->tm_mday = day; // Day
-    date->tm_mon = month - 1; // Months since January
-    date->tm_year = year - 1900; // Years since 1900
-	
-	return;
-}
+
 
 // Wrapper function that fills all stat data members of player object
 void calcStats(){
