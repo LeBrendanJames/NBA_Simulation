@@ -36,6 +36,7 @@ private:
     std::vector<Constraint*> constraints;
 
 public:
+    int getPID(int);
     std::string getCategory(int);
     Constraint* getConstraint(int);
     int getNumCategories();
@@ -49,19 +50,26 @@ private:
 	int pID;
 	
 	// Vector of response values
-    std::vector<float> resVals;
+    std::vector<double> resVals;
 
 public:
-	
+    //** Need constructor/destructor**
+
+    void addPID(int);
+    void addResVal(double);
 };
 
 class DBRes {
+private:
 	// Vector of pointers to playerResponse objects?
 		// Player response objects contain playerID and vector of response values? **Class PlayerRes**
 		// How do I handle the type of the response? Will it always be int or float? Probably float, since that's still fine for ints
 	std::vector<PlayerRes*> playerRes;
 
 	// Can just create with the first vector, then create response objects as I go?
+public:
+    PlayerRes * getPlayerRes(int);
+    void addPlayerRes(int, double);
 };
 
 
@@ -79,8 +87,8 @@ class DBInterface{
 		// dbInterface will expose only one function, which takes a DBReq object containing a vector of categories to pull, 
 		// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
 		bool getData(DBReq * req, DBRes * res);
-	
-	
+
+        bool getFGA(DBReq * req, DBRes * res);
 	
 	
 	

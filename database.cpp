@@ -7,6 +7,30 @@
 #include <string>
 #include <iostream>
 
+int DBReq::getPID(int playerNum){
+    return pIDs[playerNum];
+}
+
+void PlayerRes::addPID(int pID){
+    this->pID = pID;
+}
+
+void PlayerRes::addResVal(double val){
+    this->resVals.push_back(val);
+}
+
+PlayerRes * DBRes::getPlayerRes(int resNum){
+    return playerRes[resNum];
+}
+
+void DBRes::addPlayerRes(int pID, double resVal){
+    PlayerRes * newRes = new PlayerRes;
+    newRes->addPID(pID);
+    newRes->addResVal(resVal);
+    playerRes.push_back(newRes);
+    return;
+}
+
 // Map of categories to database tables
 // Categories are submitted by all upstream code, and are translated into tables and cols here
 // This makes it easy to change underlying database structure without having to change any upstream code
@@ -103,6 +127,25 @@ bool DBInterface::getData(DBReq * req, DBRes * res){
 	
 	
 	return true;
+}
+
+bool DBInterface::getFGA(DBReq * req, DBRes * res){
+    std::string queryStr = "SELECT count(event_type) FROM pbp WHERE event_type = 'shot' AND player = ";
+    queryStr += std::to_string(req->getPID(0));
+    queryStr += " GROUP BY player";
+
+    PGresult * slctRes = PQexec(conn, queryStr.c_str());
+
+    char * dbResult = PQgetvalue(slctRes, 0, 0);
+    char * resStr = new char[256];
+    strcpy(resStr, dbResult);
+
+    double resFloat = atof(resStr);
+
+    res->addPlayerRes(req->getPID(0), resFloat);
+
+    delete [] resStr;
+    return true;
 }
 
 /*
