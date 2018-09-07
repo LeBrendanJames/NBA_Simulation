@@ -7,22 +7,174 @@
 #include <string>
 #include <iostream>
 
+
+// Constraint constructor  
+Constraint::Constraint(){
+	constraintDate = new struct tm *; // Allocate struct tm memory 
+}
+
+// Constraint destructor
+Constraint::~Constraint(){
+	delete constraintDate; // Free memory
+}
+
+// GET constraintType 
+std::string Constraint::getConstraintType(){
+	return this->constraintType;
+}
+
+// GET constraintNum
+int Constraint::getConstraintNum(){
+	return this->constraintNum;
+}
+
+// GET constraintDate 
+void Constraint::getConstraintDate(struct tm * date){
+	date->tm_mday = this->constraintDate->tm_day; // Day
+    date->tm_mon = this->constraintDate->tm_mon; // Months since January
+    date->tm_year = this->constraintDate->tm_year; // Years since 1900
+	
+	return;
+}
+
+// SET constraint **Does struct tm have a copy constructor? Can I just do constraintDate = this->constraintDate;?**
+void setConstraint(std::string constraintType, int constraintNum, struct tm * constraintDate){
+	this->constraintType = constraintType;
+	this->constraintNum = constraintNum;
+	this->constraintDate->tm_day = constraintDate->tm_day;
+	this->constraintDate->tm_mon = constraintDate->tm_mon;
+	this->constraintDate->tm_year = constraintDate->tm_year;
+	
+	return;
+}
+
+
+// DBReq constructor
+DBReq::DBReq(){
+	
+}
+
+// DBReq destructor 
+DBReq::~DBReq(){
+	
+}
+
+// GET numPIDs
+int DBReq::getNumPIDs(){
+	return pIDs.size();
+}
+
+// GET numCategories
+int DBReq::getNumCategories(){
+	return categories.size();
+}
+
+// GET numConstraints
+int DBReq::getNumConstraints(){
+	return constraints.size();
+}
+
+// GET PID
 int DBReq::getPID(int playerNum){
     return pIDs[playerNum];
 }
 
+// GET Category
+std::string DBReq::getCategory(int categoryNum){
+	return categories[categoryNum];
+}
+
+// GET Constraint
+void DBReq::getConstraint(Constraint * constraint, int constraintNum){
+	struct tm * tempDate = new struct tm;
+	this->constraints[constraintNum]->getconstraintDate(tempDate); // Set tempDate = constraintDate 
+	
+	constraint->setConstraint(this->constraints[constraintNum]->getConstraintType(), this->constraints[constraintNum]->getConstraintNum(), tempDate)
+	
+	return;
+}
+
+// SET PID 
+void DBReq::addPID(int newPID){
+	pIDs.push_back(newPID);
+	
+	return;
+}
+
+// SET Category 
+void DBReq::addCategory(std::string newCategory){
+	categories.push_back(newCategory);
+	
+	return;
+}
+
+// SET Constraint 
+void DBReq::addConstraint(std::string newConstraintName, int newConstraintNum, struct tm * newConstraintDate){
+	Constraint * newConstraint = new Constraint; // Allocate new constraint
+	newConstraint->setConstraint(newConstraintName, newConstraintNum, newConstraintDate); // Fill constraint 
+	constraints->push_back(newConstraint); // Add pointer to constraint* vector 
+	
+	return;
+}
+
+
+
+// PlayerRes constructor
+PlayerRes::PlayerRes(){
+	
+}
+
+// PlayerRes destructor
+PlayerRes::~PlayerRes(){
+	
+}
+
+// SET PID 
 void PlayerRes::addPID(int pID){
     this->pID = pID;
 }
 
+// SET resVal 
 void PlayerRes::addResVal(double val){
     this->resVals.push_back(val);
 }
 
-PlayerRes * DBRes::getPlayerRes(int resNum){
-    return playerRes[resNum];
+// GET resVals Size
+int PlayerRes::getResValsSize(){
+	return this->resVals.size();
 }
 
+// GET PID
+int PlayerRes::getPID(){
+	return this->pID;
+}
+
+// GET resVal
+double PlayerRes::getResVal(int valNum){
+	return this->resVals[valNum]
+}
+
+// DBRes constructor
+DBRes::DBRes(){
+	
+}
+
+// DBRes destructor
+DBRes::~DBRes(){
+	
+}
+
+// GET playerRes 
+void DBRes::getPlayerRes(PlayerRes * newPlayerRes, int resNum){
+    newPlayerRes->addPID(this->getPID());
+	for (int i = 0; i < this->getResValsSize(); i++){
+		newPlayerRes->resVals.push_back(this->getResVal(i));
+	}
+	
+	return;
+}
+
+// SET playerRes 
 void DBRes::addPlayerRes(int pID, double resVal){
     PlayerRes * newRes = new PlayerRes;
     newRes->addPID(pID);
@@ -30,6 +182,9 @@ void DBRes::addPlayerRes(int pID, double resVal){
     playerRes.push_back(newRes);
     return;
 }
+
+
+
 
 // Map of categories to database tables
 // Categories are submitted by all upstream code, and are translated into tables and cols here
@@ -130,18 +285,23 @@ bool DBInterface::getData(DBReq * req, DBRes * res){
 }
 
 bool DBInterface::getFGA(DBReq * req, DBRes * res){
+	// Set query
     std::string queryStr = "SELECT count(event_type) FROM pbp WHERE event_type = 'shot' AND player = ";
     queryStr += std::to_string(req->getPID(0));
     queryStr += " GROUP BY player";
 
+	// Execute query
     PGresult * slctRes = PQexec(conn, queryStr.c_str());
 
+	// Get FGA out of query result
     char * dbResult = PQgetvalue(slctRes, 0, 0);
     char * resStr = new char[256];
     strcpy(resStr, dbResult);
 
+	// Place FGA in resFloat 
     double resFloat = atof(resStr);
 
+	// add to DBRes 
     res->addPlayerRes(req->getPID(0), resFloat);
 
     delete [] resStr;
