@@ -109,11 +109,11 @@ private:
 	// Can just create with the first vector, then create response objects as I go?
 public:
 	// Constructor/Destructor 
-	PlayerRes();
-	~PlayerRes();
+	DBRes();
+	~DBRes();
 	
 	// Getter 
-    PlayerRes * getPlayerRes(int);
+    void getPlayerRes(PlayerRes *, int);
 	
 	// Setter 
     void addPlayerRes(int, double);
@@ -136,7 +136,7 @@ class DBInterface{
 		
 		// dbInterface will expose only one function, which takes a DBReq object containing a vector of categories to pull, 
 		// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
-		bool getData(DBReq * req, DBRes * res);
+		//bool getData(DBReq * req, DBRes * res);
 
         bool getFGA(DBReq * req, DBRes * res);
 	

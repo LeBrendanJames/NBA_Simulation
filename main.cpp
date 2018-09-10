@@ -1,6 +1,7 @@
 #include <iostream>
 #include <libpq-fe.h>
 #include "database.h"
+#include "player.h"
 #include <ctime>
 
 void do_exit(PGconn *conn) {
@@ -9,6 +10,17 @@ void do_exit(PGconn *conn) {
 }
 
 int main() {
+
+    // Create DB Class
+    DBInterface * dbFace = new DBInterface;
+    // Create player, passing in DB class
+    Player * playerOne = new Player(dbFace);
+        // set all the stuff for the player
+    // Get player FGA
+
+    // Print FGA
+
+    // Exit
 
     // INPUTS:
     // Players for each team

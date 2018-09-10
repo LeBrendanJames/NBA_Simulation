@@ -10,7 +10,7 @@
 
 // Constraint constructor  
 Constraint::Constraint(){
-	constraintDate = new struct tm *; // Allocate struct tm memory 
+	constraintDate = new struct tm; // Allocate struct tm memory
 }
 
 // Constraint destructor
@@ -30,7 +30,7 @@ int Constraint::getConstraintNum(){
 
 // GET constraintDate 
 void Constraint::getConstraintDate(struct tm * date){
-	date->tm_mday = this->constraintDate->tm_day; // Day
+	date->tm_mday = this->constraintDate->tm_mday; // Day
     date->tm_mon = this->constraintDate->tm_mon; // Months since January
     date->tm_year = this->constraintDate->tm_year; // Years since 1900
 	
@@ -38,10 +38,10 @@ void Constraint::getConstraintDate(struct tm * date){
 }
 
 // SET constraint **Does struct tm have a copy constructor? Can I just do constraintDate = this->constraintDate;?**
-void setConstraint(std::string constraintType, int constraintNum, struct tm * constraintDate){
+void Constraint::setConstraint(std::string constraintType, int constraintNum, struct tm * constraintDate){
 	this->constraintType = constraintType;
 	this->constraintNum = constraintNum;
-	this->constraintDate->tm_day = constraintDate->tm_day;
+	this->constraintDate->tm_mday = constraintDate->tm_mday;
 	this->constraintDate->tm_mon = constraintDate->tm_mon;
 	this->constraintDate->tm_year = constraintDate->tm_year;
 	
@@ -87,9 +87,9 @@ std::string DBReq::getCategory(int categoryNum){
 // GET Constraint
 void DBReq::getConstraint(Constraint * constraint, int constraintNum){
 	struct tm * tempDate = new struct tm;
-	this->constraints[constraintNum]->getconstraintDate(tempDate); // Set tempDate = constraintDate 
+	this->constraints[constraintNum]->getConstraintDate(tempDate); // Set tempDate = constraintDate
 	
-	constraint->setConstraint(this->constraints[constraintNum]->getConstraintType(), this->constraints[constraintNum]->getConstraintNum(), tempDate)
+	constraint->setConstraint(this->constraints[constraintNum]->getConstraintType(), this->constraints[constraintNum]->getConstraintNum(), tempDate);
 	
 	return;
 }
@@ -112,7 +112,7 @@ void DBReq::addCategory(std::string newCategory){
 void DBReq::addConstraint(std::string newConstraintName, int newConstraintNum, struct tm * newConstraintDate){
 	Constraint * newConstraint = new Constraint; // Allocate new constraint
 	newConstraint->setConstraint(newConstraintName, newConstraintNum, newConstraintDate); // Fill constraint 
-	constraints->push_back(newConstraint); // Add pointer to constraint* vector 
+	constraints.push_back(newConstraint); // Add pointer to constraint* vector
 	
 	return;
 }
@@ -151,7 +151,7 @@ int PlayerRes::getPID(){
 
 // GET resVal
 double PlayerRes::getResVal(int valNum){
-	return this->resVals[valNum]
+	return this->resVals[valNum];
 }
 
 // DBRes constructor
@@ -166,9 +166,9 @@ DBRes::~DBRes(){
 
 // GET playerRes 
 void DBRes::getPlayerRes(PlayerRes * newPlayerRes, int resNum){
-    newPlayerRes->addPID(this->getPID());
-	for (int i = 0; i < this->getResValsSize(); i++){
-		newPlayerRes->resVals.push_back(this->getResVal(i));
+    newPlayerRes->addPID(this->playerRes[resNum]->getPID());
+	for (int i = 0; i < this->playerRes[resNum]->getResValsSize(); i++){
+		newPlayerRes->addResVal(this->playerRes[resNum]->getResVal(i));
 	}
 	
 	return;
@@ -205,7 +205,7 @@ DBInterface::~DBInterface() {
 	PQfinish(conn);
 }
 
-
+/*
 bool DBInterface::getData(DBReq * req, DBRes * res){
 	// Build query here
 	std::string queryStr = "SELECT ";
@@ -225,7 +225,7 @@ bool DBInterface::getData(DBReq * req, DBRes * res){
 
     queryStr += "FROM pbp "; // **Temp measure, since everything I'm selecting comes from pbp**
 
-    /*
+
 	// First table should be automatically included, then any others must be (inner?) joined on
 	std::vector<std::string> tablesUsed;
 	for (int i = 0; i < req->getNumCategories(); i++){
@@ -245,7 +245,7 @@ bool DBInterface::getData(DBReq * req, DBRes * res){
                 // JOIN
             }
         }
-	}*/
+	}
 
 
     // Joins
@@ -283,6 +283,7 @@ bool DBInterface::getData(DBReq * req, DBRes * res){
 	
 	return true;
 }
+*/
 
 bool DBInterface::getFGA(DBReq * req, DBRes * res){
 	// Set query

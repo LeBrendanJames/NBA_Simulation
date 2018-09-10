@@ -12,10 +12,7 @@
 
 class Player {
 	private:
-		// Constructors
-		Player(DBInterface * db);
-		Player(DBInterface * db, int pID);
-		Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate);
+
 	
 		int playerID;
 		
@@ -53,9 +50,12 @@ class Player {
 	bool getTeamFTA();
 	bool getTeamTOV();*/
 	
-	
-	
-	public:
+public:
+	// Constructors
+	Player(DBInterface * db);
+	Player(DBInterface * db, int pID);
+	Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate);
+
 		float getShootPct();
 		float getTovPct();
 		float getDrawFoulPct();
