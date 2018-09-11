@@ -15,12 +15,18 @@ int main() {
     DBInterface * dbFace = new DBInterface;
     // Create player, passing in DB class
     Player * playerOne = new Player(dbFace);
-        // set all the stuff for the player
+
+    // set all the stuff for the player
+    playerOne->setPID(196); // 196 = James Harden
+    
     // Get player FGA
+    playerOne->calcStats();
 
     // Print FGA
+    std::cout << playerOne->getShootPct() << std::endl;
 
-    // Exit
+    delete playerOne;
+    delete dbFace;
 
     // INPUTS:
     // Players for each team
@@ -35,7 +41,7 @@ int main() {
     // Create DB connection
     // TODO: Abstract away connection string before uploading to Github
     // TODO: Seems like 'passfile' parameter can be used for this
-    PGconn *conn = PQconnectdb("user=postgres dbname=nba_db password=superSecretPassword");
+    /*PGconn *conn = PQconnectdb("user=postgres dbname=nba_db password=superSecretPassword");
 
     // Check for connection failure
     if (PQstatus(conn) == CONNECTION_BAD) {
@@ -83,7 +89,7 @@ int main() {
     }
     delete[] resultString;
 
-    PQfinish(conn);
+    PQfinish(conn);*/
 
     // Given all needed inputs, I want to be able to estimate probabilities of all possible plays happening
     // on a given possession

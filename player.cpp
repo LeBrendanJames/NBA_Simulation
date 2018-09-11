@@ -26,8 +26,7 @@ Player::Player(DBInterface * db){
 	
 	endDate = new struct tm;
 	setDate(endDate, 1, 1, 3000);
-	
-	
+
 }
 
 Player::Player(DBInterface * db, int pID){
@@ -52,60 +51,63 @@ Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * end
 
 
 
+int Player::getFGAFromDB() {
+    // Create DBReq
+    DBReq * req = new DBReq;
+    req->addPID(this->playerID);
 
+    // Create DBRes
+    DBRes * res = new DBRes;
+
+    // Call getFGA from DBInterface
+    this->db->getFGA(req, res);
+
+    // get Player Res from res object
+    PlayerRes * plyrRes = new PlayerRes;
+    res->getPlayerRes(plyrRes, 0);
+
+    // Return value from DBRes
+    return static_cast<int>(plyrRes->getResVal(0));
+}
 
 // Wrapper function that fills all stat data members of player object
-void calcStats(){
-	
-	shootPct = calcStat('shootPct');
-	tovPct = calcStat('tovPct');
-	drawFoulPct = calcStat('drawFoulPct');
-	drebPct = calcStat('drebPct');
-	orebPct = calcStat('orebPct');
-	
-	return;
+void Player::calcStats(){
+
+    int FGA = getFGAFromDB();
+
+    // **FOR TESTING. Obviously FGA != shootPct**
+    this->shootPct = static_cast<double>(FGA);
+
+    return;
 }
 
-float calcStat(std::string * statName){
-	float pctStat = 0.0;
-	
-	// Build DBReq (just the start date/ end date/playerID)
-	// The rest will be built at the database level, since that level will know how to build a request to get the data needed by this function
-	DBReq * req = new DBReq(pID, startDate, endDate);
-	DBRes * res = new DBRes();
-	
-	// Send req, res, and statName to dbInterface object
-	db->getStatFromDB(req, res, statName);
-	
-	// Add stat to correct variable
-	pctStat = res->singleStat;
-	
-	// Clear allocated memory
-	delete req;
-	delete res;
-	
-	return pctStat;
-}
+
 
 
 
 // GETTERS
-float getShootPct(){
+double Player::getShootPct(){
 	return shootPct;
 }
 
-float getTovPct(){
+double Player::getTovPct(){
 	return tovPct;
 }
 
-float getDrawFoulPct(){
+double Player::getDrawFoulPct(){
 	return drawFoulPct;
 }
 
-float getDrebPct(){
+double Player::getDrebPct(){
 	return drebPct;
 }
 
-float getOrebPct(){
+double Player::getOrebPct(){
 	return orebPct;
+}
+
+
+// SETTERS
+void Player::setPID(int newPID){
+    playerID = newPID;
 }
