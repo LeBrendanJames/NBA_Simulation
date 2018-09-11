@@ -12,12 +12,14 @@
 class Player {
 private:
     int playerID;
+	int teamID; // If you want to restrict data pulled to a player's games for a certain team (for players that have played on multiple teams)
 
     struct tm * startDate;
     struct tm * endDate;
 
-    DBInterface * db;
+    DBInterface * db; // Pointer to DBInterface, which exposes connection and pre-written DB access functions 
 
+	// Percentages of how often a player finishes a team play (based on the 5 types of things that can happen - some offensive & some defensive)
     double shootPct;
     double tovPct;
     double drawFoulPct;
@@ -67,6 +69,9 @@ public:
 
     // Setters
     void setPID(int);
+	void setTeamID(int);
+	void setStartDate(int, int, int);
+	void setEndDate(int, int, int);
 		
 };
 

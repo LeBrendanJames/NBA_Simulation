@@ -46,7 +46,7 @@ Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * end
 	this->startDate = startDate;
 	this->endDate = endDate;
 	
-	// **Maybe chaeck that the passed in start and end date are valid??**
+	// **Maybe check that the passed in start and end date are valid??**
 }
 
 
@@ -110,4 +110,16 @@ double Player::getOrebPct(){
 // SETTERS
 void Player::setPID(int newPID){
     playerID = newPID;
+}
+
+void Player::setTeamID(int teamID){
+	this->teamID = teamID;
+}
+
+void Player::setStartDate(int day, int month, int year){
+	setTime(this->startDate, day, month, year);
+}
+
+void Player::setEndDate(int day, int month, int year){
+	setTime(this->endDate, day, month, year);
 }

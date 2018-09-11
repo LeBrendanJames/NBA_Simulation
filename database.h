@@ -124,56 +124,28 @@ public:
 
 
 class DBInterface{
-	
-	private:
-		PGconn * conn;
+private:
+	PGconn * conn;
 
+public:
+	// Connection open upon constructing and close upon deconstruction 
+	DBInterface(); // Use dependency injection?
+	~DBInterface();
 	
-	public:
-		// Connection open upon constructing and close upon deconstruction 
-		DBInterface(); // Use dependency injection?
-		~DBInterface();
-		
-		// dbInterface will expose only one function, which takes a DBReq object containing a vector of categories to pull, 
-		// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
-		//bool getData(DBReq * req, DBRes * res);
+	// dbInterface will expose only one function, which takes a DBReq object containing a vector of categories to pull, 
+	// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
+	//bool getData(DBReq * req, DBRes * res);
 
-        bool getFGA(DBReq * req, DBRes * res);
-	
-	
-	
-	
-		// Base function through which all SELECT requests are sent 
-	// This is the only function that directly interacts with the database. All other functions build DBReq objects and pass them to 'getDataFromDB'
-	// **This function allocates memory to the passed in DBRes pointer, which needs to be deleted by the calling function**
-	//bool getDataFromDB(PGconn * conn, DBReq * req, DBRes * res);
-	
-	
-	
-	
-	/*bool getMinutes();
-	bool getFGA();
-	bool getFGM();
-	bool get3PM();
-	bool get3PA();
-	bool getDREB();
-	bool getOREB();
-	bool getSteals();
-	bool getBlocks();
-	bool getTurnovers();
-
-	bool getPossessionCount(DBReq * req, DBRes * res); // Will take an array of player ID's so this will return possessions for which all players were on the court (for the same team)
 	bool getFGA(DBReq * req, DBRes * res);
-	bool getFGM(DBReq * req, DBRes * res);
-	bool get3FGM(DBReq * req, DBRes * res);
+	/*bool getFGM(DBReq * req, DBRes * res);
+	bool get3PM(DBReq * req, DBRes * res);
+	bool get3PA(DBReq * req, DBRes * res);
 	bool getDREB(DBReq * req, DBRes * res);
-	// etc...
-
-
-	bool getPlayerTotalPoints(PGconn * conn, char * resultString, int playerID, struct tm * startDate, struct tm * endDate);
-	bool getTeamPossessionCount(PGconn * conn, char * resultString, std::string teamName, struct tm * startDate, struct tm * endDate);*/
+	bool getOREB(DBReq * req, DBRes * res);
+	bool getSteals(DBReq * req, DBRes * res);
+	bool getBlocks(DBReq * req, DBRes * res);
+	bool getTurnovers(DBReq * req, DBRes * res);*/
 		
-
 };
 
 #endif //SIMULATION_DATABASE_H
