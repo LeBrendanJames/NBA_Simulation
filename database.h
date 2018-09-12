@@ -116,7 +116,8 @@ public:
     void getPlayerRes(PlayerRes *, int);
 	
 	// Setter 
-    void addPlayerRes(int, double);
+    void addPlayerRes(int);
+	void addPlayerResVal(double);
 };
 
 
@@ -126,6 +127,8 @@ public:
 class DBInterface{
 private:
 	PGconn * conn;
+	
+	void fillRes(DBRes * res, PGresult * slctRes);
 
 public:
 	// Connection open upon constructing and close upon deconstruction 
@@ -145,7 +148,28 @@ public:
 	bool getSteals(DBReq * req, DBRes * res);
 	bool getBlocks(DBReq * req, DBRes * res);
 	bool getTurnovers(DBReq * req, DBRes * res);*/
-		
+	
+	bool getDataFromDB(DBReq * req, DBRes * res);
+	
 };
+
+
+// QUERY
+
+
+class Query {
+private:
+	std::string queryStr;
+	std::string whereStr;
+	std::string groupStr;
+	
+	void buildQueryFromReq(DBReq *);
+	
+public:
+	Query(DBReq *);
+	~Query();
+	
+	std::string createFullStr();
+}
 
 #endif //SIMULATION_DATABASE_H

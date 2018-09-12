@@ -59,32 +59,47 @@ int Player::getFGAFromDB() {
     // Create DBReq
     DBReq * req = new DBReq;
     req->addPID(this->playerID);
+	// Additional constraints
 
     // Create DBRes
     DBRes * res = new DBRes;
 
     // Call getFGA from DBInterface
-    this->db->getFGA(req, res);
+    bool dbResult = this->db->getFGA(req, res);
+	if (!dbResult){
+		// Throw error & return -1?
+	}
 
     // get Player Res from res object
     PlayerRes * plyrRes = new PlayerRes;
     res->getPlayerRes(plyrRes, 0);
+	int retVal = static_cast<int>(plyrRes->getResVal(0))
+	
+	// Delete plyrRes
+	delete plyrRes;
+	
+	// Delete req & res
+	delete req;
+	delete res;
 
     // Return value from DBRes
-    return static_cast<int>(plyrRes->getResVal(0));
+	return retVal;
+    //return static_cast<int>(plyrRes->getResVal(0));
 }
+
 
 // Wrapper function that fills all stat data members of player object
 void Player::calcStats(){
 
     int FGA = getFGAFromDB();
+	if (FGA == -1){
+		// Error handle
+	}
     //int FGM = getFGMFromDB();
 
     // **FOR TESTING. Obviously FGA != shootPct**
     this->shootPct = static_cast<double>(FGA);
 }
-
-
 
 
 

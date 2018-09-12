@@ -37,6 +37,7 @@ private:
 // TODO: think through scenarios where a player changes teams. Each function should be able to handle that
 // TODO: Design a 'DBRequest' object that has all the possible request parameters
 
+	// Private functions to get data from DB, for purpose fo filling private variables
     int getFGAFromDB();
 
 

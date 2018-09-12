@@ -174,26 +174,20 @@ void DBRes::getPlayerRes(PlayerRes * newPlayerRes, int resNum){
 	return;
 }
 
-// SET playerRes 
-void DBRes::addPlayerRes(int pID, double resVal){
+// SET playerResObj 
+void DBRes::addPlayerRes(int pID){
     PlayerRes * newRes = new PlayerRes;
     newRes->addPID(pID);
-    newRes->addResVal(resVal);
     playerRes.push_back(newRes);
-    return;
+}
+
+// SET playerResVal at back 
+void DBRes::addPlayerResVal(double resVal){
+	playerRes[playerRes.size() - 1]->addResVal(resVal);
 }
 
 
 
-
-// Map of categories to database tables
-// Categories are submitted by all upstream code, and are translated into tables and cols here
-// This makes it easy to change underlying database structure without having to change any upstream code
-std::string statCategories[5] = {"minutes", "FGA", "FGM", "3PA", "3PM"};
-std::string tableNames[5] = {"pbp", "pbp", "pbp", "pbp", "pbp"};
-std::string colNames[5] = {"elapsed time", "shot", "shot", "shot", "shot"};
-std::string constraintCategories[5] = {"something here"};
-std::string constraintNames[5] = {"something here"};
 
 // Default constructor
 DBInterface::DBInterface(){
@@ -205,85 +199,6 @@ DBInterface::~DBInterface() {
 	PQfinish(conn);
 }
 
-/*
-bool DBInterface::getData(DBReq * req, DBRes * res){
-	// Build query here
-	std::string queryStr = "SELECT ";
-
-	for (int i = 0; i < req->getNumCategories(); i++) {
-        int j = 0;
-        while (req->getCategory(i) !=statCategories[j]) {
-            j++;
-        }
-        // check that they have found a match here, and add category to SQL
-        if (req->getCategory(i) == statCategories[j]){
-            queryStr += colNames[j];
-            queryStr += ' ';
-            // **Update 'fromStr' in here, with joining? 'joinStr' **
-        }
-    }
-
-    queryStr += "FROM pbp "; // **Temp measure, since everything I'm selecting comes from pbp**
-
-
-	// First table should be automatically included, then any others must be (inner?) joined on
-	std::vector<std::string> tablesUsed;
-	for (int i = 0; i < req->getNumCategories(); i++){
-        int j = 0;
-        while (req->getCategory(i) != statCategories[j]) {
-            j++;
-        }
-        // check that they have found a match here, and add category to SQL
-        if (req->getCategory(i) == statCategories[j]){
-            bool prevIncl = false;
-            for (int k = 0; k < tablesUsed.size(); k++){
-                if (tableNames[j] == tablesUsed[k]){
-                    prevIncl = true;
-                }
-            }
-            if (!prevIncl) {
-                // JOIN
-            }
-        }
-	}
-
-
-    // Joins
-
-    // where
-    std::string whereStr;
-    whereStr += "WHERE ";
-    for (int i = 0; i < req->getNumConstraints(); i++){
-        int j = 0;
-        while (req->getConstraint(i)->getConstraintType() != constraintCategories[j]) {
-            j++;
-        }
-        // check that they have found a match here, and add category to SQL
-        if (req->getConstraint(i)->getConstraintType() == constraintCategories[j]){
-            whereStr += constraintNames[j];
-            whereStr += " = ";
-            whereStr += req->getConstraint(i)->getConstraintNum();
-        }
-    }
-    queryStr += whereStr;
-
-    // group by (** This will have to be refined as I have SELECT statments that aren't grouped by player**)
-    std::string groupStr;
-    groupStr += "GROUP BY player_id ";
-    queryStr += groupStr;
-
-    // having
-	
-	
-	// query DB 
-	PGresult * selectResult = PQexec(conn, queryStr.c_str());
-	
-	// Place results into res
-	
-	
-	return true;
-}
-*/
 
 bool DBInterface::getFGA(DBReq * req, DBRes * res){
 	// Set query
@@ -296,6 +211,10 @@ bool DBInterface::getFGA(DBReq * req, DBRes * res){
 
 	// Get FGA out of query result
     char * dbResult = PQgetvalue(slctRes, 0, 0);
+	if (PQntuples(slctRes) <= 0){
+		return false;
+	}
+	
     char * resStr = new char[256];
     strcpy(resStr, dbResult);
 
@@ -309,64 +228,105 @@ bool DBInterface::getFGA(DBReq * req, DBRes * res){
     return true;
 }
 
-/*
+bool DBInterface::getDataFromDB(DBReq * req, DBRes * res){
+	// Build query (THIS CONSTRUCTOR CONTAINS HARD-CODED LOGIC BETWEEN PROGRAM AND TABLE/COLUMN NAMES IN DATABASE)
+	Query * qry = new Query(req);
+	
+	// Execute query
+	PGresult * slctRes = PQexec(conn, qry->createFullStr().c_str());
+	
+	// Place result in res
+	fillRes(res, slctRes);
+	
 
-bool getDataFromDB(PGconn * conn, DBReq * req, DBRes * res){
-	// Build query string from DBReq object
-	std::string queryStr = "SELECT ";
-	for (int i = 0; i < req->cols.size(); i++){
-		// Add cols to select 
-		queryStr += req->cols[i] + ", ";
-	}
-	queryStr += "FROM " + req->tables[0];
-	// Joins
-	// where
-	// group by
-	// having
-	
-	// Execute query & error check
-	PGresult * selectResult = PQexec(conn, queryStr.c_str());
-	
-	// Place result in DBRes object
-	// if result is a single number then
-	// else if result is just one row then
-	// else
-		// make a 2D array
-	
-	// Return
-	return true;
 }
 
-
-bool getPlayerTotalPoints(PGconn * conn, char * resStr, int playerID, struct tm * startDate, struct tm * endDate){
-    std::string queryString = "SELECT SUM(points) FROM pbp WHERE result = 'made' AND player = ";
-    queryString += std::to_string(playerID);
-    queryString += " GROUP BY player";
-
-    PGresult * selectResult = PQexec(conn, queryString.c_str());
-
-    char * dbResult = PQgetvalue(selectResult, 0, 0);
-    strcpy(resStr, dbResult);
-
-    return true;
-}
-
-bool getTeamPossessionCount(PGconn * conn, char * resultString, std::string teamName, struct tm * startDate, struct tm * endDate){
-    std::string queryString = "SELECT COUNT(";
-
-    return true;
-}
-
-bool getPlayerMins(){
+void DBInterface::fillRes(DBRes * res, PGresult * slctRes){
+	// Find number of tuples and number of fields
+	int numTuples = PQntuples(slctRes);
+    int numCols = PQnfields(slctRes);
 	
-	
-	
-	if(!getDataFromDB()){
-		// Error Handling done at top level?
-		return false;
+	for (int i = 0; i < numTuples; i++){
+		// Add playerRes object w/ data from a single tuple, i 
+		res->addPlayerRes(PQgetvalue(slctRes, i, 0));
+		for (int j = 1; j < numCols; j++){
+			// Add all associated vals from that tuple
+			res->addPlayerResVal(PQgetvalue(slctRes, i, j));
+		}
 	}
 	
-	return true;
 }
 
-*/
+Query::Query(DBReq * req){
+	queryStr = "SELECT ";
+	whereStr = "WHERE ";
+	groupStr = "GROUP BY ";
+
+	// Call functions to build up query 
+	buildQueryFromReq(req);
+}
+
+Query::~Query(){
+	
+}
+
+// HARD-CODED LOGIC FOR HOW STAT CATEGORIES ARE PULLED FROM DB 
+Query::buildQueryFromReq(DbReq * req){
+	cats[9] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers"}
+	
+	// Loop over req PIDs to add them all to where clause
+	whereStr += "("; // Open parentheses since all PID's are OR'd together in parentheses 
+	whereStr += "player = ";
+	whereStr += std::to_string(req->getPID(0));
+	for (int i = 1; i < req->getNumPIDs(); i++){
+		whereStr += " OR player = ";
+		whereStr += std::to_string(req->getPID(i));
+	}
+	whereStr += ")";
+	
+	
+	// Loop over req categories, adding to various query strings
+	for (int i = 0; i < req->getNumCategories(); i++){
+		// switch over all possible categories
+		if (req->getCategory(i) == cats[0]){
+			queryStr += " count(event_type)";
+			whereStr += " event_type = 'shot'"
+			groupStr += player;
+		} else if (req->getCategory(i) == cats[1]){
+			
+		} else if (req->getCategory(i) == cats[2]){
+			
+		} else if (req->getCategory(i) == cats[3]){
+			
+		} else if (req->getCategory(i) == cats[4]){
+			
+		} else if (req->getCategory(i) == cats[5]){
+			
+		} else if (req->getCategory(i) == cats[6]){
+			
+		} else if (req->getCategory(i) == cats[7]){
+			
+		} else if (req->getCategory(i) == cats[8]){
+			
+		} else if (req->getCategory(i) == cats[9]){
+			
+		}
+	}
+	
+	// Loop over constraints, adding to various query strings
+	
+} 
+
+Query::createFullStr(){
+	std::string fullStr = queryStr;
+	if (whereStr.length() > 6){
+		fullStr += " ";
+		fullStr += whereStr;
+	}
+	if (groupStr.length() > 9){ // Should always be included if I'm always grouping by player?
+		fullStr += " ";
+		fullStr += groupStr;
+	}
+	
+	return fullStr;
+}
