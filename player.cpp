@@ -6,7 +6,7 @@
 
 
 
-void setDate(struct tm * date, int day, int month, int year){
+void Player::setDate(struct tm * date, int day, int month, int year){
 	date->tm_mday = day; // Day
 	date->tm_mon = month - 1; // Months since January
 	date->tm_year = year - 1900; // Years since 1900
@@ -49,6 +49,10 @@ Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * end
 	// **Maybe check that the passed in start and end date are valid??**
 }
 
+Player::~Player(){
+
+}
+
 
 
 int Player::getFGAFromDB() {
@@ -74,11 +78,10 @@ int Player::getFGAFromDB() {
 void Player::calcStats(){
 
     int FGA = getFGAFromDB();
+    //int FGM = getFGMFromDB();
 
     // **FOR TESTING. Obviously FGA != shootPct**
     this->shootPct = static_cast<double>(FGA);
-
-    return;
 }
 
 
@@ -117,9 +120,9 @@ void Player::setTeamID(int teamID){
 }
 
 void Player::setStartDate(int day, int month, int year){
-	setTime(this->startDate, day, month, year);
+	setDate(this->startDate, day, month, year);
 }
 
 void Player::setEndDate(int day, int month, int year){
-	setTime(this->endDate, day, month, year);
+	setDate(this->endDate, day, month, year);
 }

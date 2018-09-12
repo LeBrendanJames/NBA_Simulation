@@ -8,6 +8,7 @@
 #include "database.h"
 #include <ctime>
 #include <string>
+#include <iostream>
 
 class Player {
 private:
@@ -27,7 +28,7 @@ private:
     double orebPct;
 
     // Used to set start date and end date
-    void setTime(struct tm *, int, int, int);
+    void setDate(struct tm *, int, int, int);
 
 // Functions to get all data needed to calc player advanced stats (USG (or a breakdown thereof), DRB%, ORB%)
 // Not using usage, as it's really a combination of a few things. Will break down into component parts

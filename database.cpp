@@ -197,7 +197,7 @@ std::string constraintNames[5] = {"something here"};
 
 // Default constructor
 DBInterface::DBInterface(){
-	conn = PQconnectdb("user=postgres dbname=nba_db password=superSecretPassword");
+	conn = PQconnectdb("user=postgres dbname=nba_db password=Bcj--403");
 }
 
 // Destructor
