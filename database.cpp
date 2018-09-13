@@ -44,8 +44,6 @@ void Constraint::setConstraint(std::string constraintType, int constraintNum, st
 	this->constraintDate->tm_mday = constraintDate->tm_mday;
 	this->constraintDate->tm_mon = constraintDate->tm_mon;
 	this->constraintDate->tm_year = constraintDate->tm_year;
-	
-	return;
 }
 
 

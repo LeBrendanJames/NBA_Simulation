@@ -5,4 +5,16 @@
 #ifndef SIMULATION_TEAM_H
 #define SIMULATION_TEAM_H
 
+class Team {
+private:
+	Player ** players;
+	Coach * coach;
+	
+public:
+	Team();
+	~Team();
+	
+};
+
+
 #endif //SIMULATION_TEAM_H
