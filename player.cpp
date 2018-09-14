@@ -100,12 +100,30 @@ void Player::calcStats(){
 		// Error handle
 	}
     int FGM = getTotalFromDB("FGM");
+	int ThreePA = getTotalFromDB("3PA");
+	int ThreePM = getTotalFromDB("3PM");
+	int DREB = getTotalFromDB("DREB");
+	int OREB = getTotalFromDB("OREB");
+	int Steals = getTotalFromDB("Steals");
+	int Blocks = getTotalFromDB("Blocks");
+	int TOV = getTotalFromDB("Turnovers");
+	
+	int offPoss = getTotalFromDB("offPoss");
+	int defPoss = getTotalFromDb("defPoss");
 
-	std::cout << "FGA = " << FGA << std::endl;
-	std::cout << "FGM = " << FGM << std::endl;
+	//std::cout << "FGA = " << FGA << std::endl;
+	//std::cout << "FGM = " << FGM << std::endl;
 
     // **FOR TESTING. Obviously FGA != shootPct**
     this->shootPct = FGM / static_cast<double>(FGA);
+	
+	// Actual stats
+	this->shootPct = FGA / static_cast<double>(offPoss);
+	this->shoot3PtPct = ThreePA / static_cast<double>(offPoss);
+	this->tovPct = TOV / static_cast<double>(offPoss);
+	this->drawFoulPct = TOV / static_cast<double>(offPoss); // **Needs to be fixed**
+	this->drebPct = DREB / static_cast<double>(defPoss);
+	this->orebPct = OREB / static_cast<double>(offPoss);
 }
 
 

@@ -22,6 +22,7 @@ private:
 
 	// Percentages of how often a player finishes a team play (based on the 5 types of things that can happen - some offensive & some defensive)
     double shootPct;
+	double shoot3PtPct;
     double tovPct;
     double drawFoulPct;
     double drebPct;
