@@ -38,7 +38,7 @@ private:
 // TODO: Design a 'DBRequest' object that has all the possible request parameters
 
 	// Private functions to get data from DB, for purpose fo filling private variables
-    int getFGAFromDB();
+    int getTotalFromDB(std::string);
 
 
 /*bool getPlayerMins(); // Get total time player was on court

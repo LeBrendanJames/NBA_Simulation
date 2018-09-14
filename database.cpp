@@ -198,7 +198,7 @@ DBInterface::~DBInterface() {
 }
 
 
-bool DBInterface::getFGA(DBReq * req, DBRes * res){
+/*bool DBInterface::getFGA(DBReq * req, DBRes * res){
 	// Set query
     std::string queryStr = "SELECT count(event_type) FROM pbp WHERE event_type = 'shot' AND player = ";
     queryStr += std::to_string(req->getPID(0));
@@ -224,39 +224,46 @@ bool DBInterface::getFGA(DBReq * req, DBRes * res){
 
     delete [] resStr;
     return true;
-}
+}*/
 
 bool DBInterface::getDataFromDB(DBReq * req, DBRes * res){
 	// Build query (THIS CONSTRUCTOR CONTAINS HARD-CODED LOGIC BETWEEN PROGRAM AND TABLE/COLUMN NAMES IN DATABASE)
 	Query * qry = new Query(req);
-	
+
+	std::cout << "Created query." << std::endl;
+	std::cout << qry->createFullStr() << std::endl;
+
 	// Execute query
 	PGresult * slctRes = PQexec(conn, qry->createFullStr().c_str());
 	
 	// Place result in res
 	fillRes(res, slctRes);
 	
-
+    return true;
 }
 
 void DBInterface::fillRes(DBRes * res, PGresult * slctRes){
 	// Find number of tuples and number of fields
 	int numTuples = PQntuples(slctRes);
     int numCols = PQnfields(slctRes);
+
+    std::cout << "numtuples = " << numTuples << std::endl;
+    std::cout << "numcols = " << numCols << std::endl;
 	
 	for (int i = 0; i < numTuples; i++){
 		// Add playerRes object w/ data from a single tuple, i 
-		res->addPlayerRes(PQgetvalue(slctRes, i, 0));
+		res->addPlayerRes(atoi(PQgetvalue(slctRes, i, 0)));
 		for (int j = 1; j < numCols; j++){
 			// Add all associated vals from that tuple
-			res->addPlayerResVal(PQgetvalue(slctRes, i, j));
+			res->addPlayerResVal(atoi(PQgetvalue(slctRes, i, j)));
 		}
 	}
 	
 }
 
 Query::Query(DBReq * req){
-	queryStr = "SELECT ";
+	queryStr = "SELECT player, ";
+	fromStr = " FROM pbp";
 	whereStr = "WHERE ";
 	groupStr = "GROUP BY ";
 
@@ -269,11 +276,11 @@ Query::~Query(){
 }
 
 // HARD-CODED LOGIC FOR HOW STAT CATEGORIES ARE PULLED FROM DB 
-Query::buildQueryFromReq(DbReq * req){
-	cats[9] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers"}
+void Query::buildQueryFromReq(DBReq * req){
+	std::string cats[9] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers"};
 	
 	// Loop over req PIDs to add them all to where clause
-	whereStr += "("; // Open parentheses since all PID's are OR'd together in parentheses 
+	whereStr += "("; // Open parentheses since all PID's are OR'd together in parentheses
 	whereStr += "player = ";
 	whereStr += std::to_string(req->getPID(0));
 	for (int i = 1; i < req->getNumPIDs(); i++){
@@ -287,11 +294,13 @@ Query::buildQueryFromReq(DbReq * req){
 	for (int i = 0; i < req->getNumCategories(); i++){
 		// switch over all possible categories
 		if (req->getCategory(i) == cats[0]){
-			queryStr += " count(event_type)";
-			whereStr += " event_type = 'shot'"
-			groupStr += player;
+			queryStr += "count(event_type)";
+			whereStr += " AND (event_type = 'shot' OR event_type = 'miss')";
+			groupStr += "player";
 		} else if (req->getCategory(i) == cats[1]){
-			
+			queryStr += "count(event_type)";
+			whereStr += " AND event_type = 'shot'";
+			groupStr += "player";
 		} else if (req->getCategory(i) == cats[2]){
 			
 		} else if (req->getCategory(i) == cats[3]){
@@ -315,8 +324,9 @@ Query::buildQueryFromReq(DbReq * req){
 	
 } 
 
-Query::createFullStr(){
+std::string Query::createFullStr(){
 	std::string fullStr = queryStr;
+	fullStr += fromStr;
 	if (whereStr.length() > 6){
 		fullStr += " ";
 		fullStr += whereStr;

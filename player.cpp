@@ -55,17 +55,20 @@ Player::~Player(){
 
 
 
-int Player::getFGAFromDB() {
+int Player::getTotalFromDB(std::string category) {
     // Create DBReq
     DBReq * req = new DBReq;
     req->addPID(this->playerID);
+    req->addCategory(category);
 	// Additional constraints
 
     // Create DBRes
     DBRes * res = new DBRes;
 
+    std::cout << "About to get data from DB." << std::endl;
+
     // Call getFGA from DBInterface
-    bool dbResult = this->db->getFGA(req, res);
+    bool dbResult = this->db->getDataFromDB(req, res);
 	if (!dbResult){
 		// Throw error & return -1?
 	}
@@ -73,7 +76,7 @@ int Player::getFGAFromDB() {
     // get Player Res from res object
     PlayerRes * plyrRes = new PlayerRes;
     res->getPlayerRes(plyrRes, 0);
-	int retVal = static_cast<int>(plyrRes->getResVal(0))
+	int retVal = static_cast<int>(plyrRes->getResVal(0));
 	
 	// Delete plyrRes
 	delete plyrRes;
@@ -91,14 +94,18 @@ int Player::getFGAFromDB() {
 // Wrapper function that fills all stat data members of player object
 void Player::calcStats(){
 
-    int FGA = getFGAFromDB();
+    //int FGA = getFGAFromDB();
+    int FGA = getTotalFromDB("FGA");
 	if (FGA == -1){
 		// Error handle
 	}
-    //int FGM = getFGMFromDB();
+    int FGM = getTotalFromDB("FGM");
+
+	std::cout << "FGA = " << FGA << std::endl;
+	std::cout << "FGM = " << FGM << std::endl;
 
     // **FOR TESTING. Obviously FGA != shootPct**
-    this->shootPct = static_cast<double>(FGA);
+    this->shootPct = FGM / static_cast<double>(FGA);
 }
 
 

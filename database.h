@@ -139,8 +139,8 @@ public:
 	// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
 	//bool getData(DBReq * req, DBRes * res);
 
-	bool getFGA(DBReq * req, DBRes * res);
-	/*bool getFGM(DBReq * req, DBRes * res);
+	/*bool getFGA(DBReq * req, DBRes * res);
+	bool getFGM(DBReq * req, DBRes * res);
 	bool get3PM(DBReq * req, DBRes * res);
 	bool get3PA(DBReq * req, DBRes * res);
 	bool getDREB(DBReq * req, DBRes * res);
@@ -160,6 +160,7 @@ public:
 class Query {
 private:
 	std::string queryStr;
+	std::string fromStr;
 	std::string whereStr;
 	std::string groupStr;
 	
@@ -168,8 +169,8 @@ private:
 public:
 	Query(DBReq *);
 	~Query();
-	
+
 	std::string createFullStr();
-}
+};
 
 #endif //SIMULATION_DATABASE_H
