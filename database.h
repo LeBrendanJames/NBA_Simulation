@@ -40,12 +40,12 @@ public:
 class DBReq {
 private:
 	// Vector of playerID's, so that a req can be sent for multiple players at once
-    std::vector<int> pIDs;
+    int pID;
 
     // Vector of categories to pull, so that a request for multiple categories can be sent at once 
     // (will be written in bball terms, so will have to translate to table columns in DAL -
     // should be easy with a hard-coded translation map)
-	std::vector<std::string> categories;
+	std::string category;
 
     // Vector of constraints (Same deal - will have to translate to actual table & column names)
 	// This is a list of constraints, both name and value (number or date in struct tm)
@@ -56,15 +56,15 @@ public:
 	DBReq();
 	~DBReq();
 	
-	// Get size of underlying vectors
-	int getNumPIDs();
-    int getNumCategories();
+	// Get size of constraints vector 
     int getNumConstraints();
 	
 	// Getters
-    int getPID(int);
-    std::string getCategory(int);
+    int getPID();
+    std::string getCategory();
     void getConstraint(Constraint *, int); // Must pass in a struct tm pointer that will be filled with the information in this constraint
+	int getConstraintNum(int constrNum); // Pass in which constraint, get back constraintNum for that one
+	std::string getConstraintDate(int constrNum); // Pass in which constraint, get back constraintDate for that one (as string, ready for SQL query)
 	
 	// Setters
 	void addPID(int);
@@ -135,20 +135,8 @@ public:
 	DBInterface(); // Use dependency injection?
 	~DBInterface();
 	
-	// dbInterface will expose only one function, which takes a DBReq object containing a vector of categories to pull, 
-	// a vector of constraint objects, and maybe some other stuff (to be determined later as I write code)
-	//bool getData(DBReq * req, DBRes * res);
-
-	/*bool getFGA(DBReq * req, DBRes * res);
-	bool getFGM(DBReq * req, DBRes * res);
-	bool get3PM(DBReq * req, DBRes * res);
-	bool get3PA(DBReq * req, DBRes * res);
-	bool getDREB(DBReq * req, DBRes * res);
-	bool getOREB(DBReq * req, DBRes * res);
-	bool getSteals(DBReq * req, DBRes * res);
-	bool getBlocks(DBReq * req, DBRes * res);
-	bool getTurnovers(DBReq * req, DBRes * res);*/
-	
+	// dbInterface will expose only one function, which takes a DBReq object containing a player ID, 
+	// a category to pull, and a vector of constraint objects
 	bool getDataFromDB(DBReq * req, DBRes * res);
 	
 };
@@ -160,6 +148,8 @@ public:
 class Query {
 private:
 	std::string queryStr;
+	std::vector<std::string> * joinStrs; // Can be multiple joins, so store in vector
+	std::vector<std::string> * onStr; // Can be multiple joins, so store in vector
 	std::string fromStr;
 	std::string whereStr;
 	std::string groupStr;

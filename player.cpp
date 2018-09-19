@@ -108,8 +108,8 @@ void Player::calcStats(){
 	int Blocks = getTotalFromDB("Blocks");
 	int TOV = getTotalFromDB("Turnovers");
 	
-	int offPoss = getTotalFromDB("offPoss");
-	int defPoss = getTotalFromDb("defPoss");
+	int offPlays = getTotalFromDB("offPlays");
+	int defPlays = getTotalFromDb("defPlays");
 
 	//std::cout << "FGA = " << FGA << std::endl;
 	//std::cout << "FGM = " << FGM << std::endl;
@@ -118,12 +118,12 @@ void Player::calcStats(){
     this->shootPct = FGM / static_cast<double>(FGA);
 	
 	// Actual stats
-	this->shootPct = FGA / static_cast<double>(offPoss);
-	this->shoot3PtPct = ThreePA / static_cast<double>(offPoss);
-	this->tovPct = TOV / static_cast<double>(offPoss);
-	this->drawFoulPct = TOV / static_cast<double>(offPoss); // **Needs to be fixed**
-	this->drebPct = DREB / static_cast<double>(defPoss);
-	this->orebPct = OREB / static_cast<double>(offPoss);
+	this->shootPct = FGA / static_cast<double>(offPlays);
+	this->shoot3PtPct = ThreePA / static_cast<double>(offPlays);
+	this->tovPct = TOV / static_cast<double>(offPlays);
+	this->drawFoulPct = TOV / static_cast<double>(offPlays); // **Needs to be fixed**
+	this->drebPct = DREB / static_cast<double>(defPlays);
+	this->orebPct = OREB / static_cast<double>(offPlays);
 }
 
 

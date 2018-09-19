@@ -57,29 +57,19 @@ DBReq::~DBReq(){
 	
 }
 
-// GET numPIDs
-int DBReq::getNumPIDs(){
-	return pIDs.size();
-}
-
-// GET numCategories
-int DBReq::getNumCategories(){
-	return categories.size();
-}
-
 // GET numConstraints
 int DBReq::getNumConstraints(){
 	return constraints.size();
 }
 
 // GET PID
-int DBReq::getPID(int playerNum){
-    return pIDs[playerNum];
+int DBReq::getPID(){
+    return pID;
 }
 
 // GET Category
-std::string DBReq::getCategory(int categoryNum){
-	return categories[categoryNum];
+std::string DBReq::getCategory(){
+	return category;
 }
 
 // GET Constraint
@@ -88,31 +78,22 @@ void DBReq::getConstraint(Constraint * constraint, int constraintNum){
 	this->constraints[constraintNum]->getConstraintDate(tempDate); // Set tempDate = constraintDate
 	
 	constraint->setConstraint(this->constraints[constraintNum]->getConstraintType(), this->constraints[constraintNum]->getConstraintNum(), tempDate);
-	
-	return;
 }
 
 // SET PID 
 void DBReq::addPID(int newPID){
-	pIDs.push_back(newPID);
-	
-	return;
+	pID = newPID;
 }
 
 // SET Category 
 void DBReq::addCategory(std::string newCategory){
-	categories.push_back(newCategory);
-	
-	return;
-}
+	category = newCategory;
 
 // SET Constraint 
 void DBReq::addConstraint(std::string newConstraintName, int newConstraintNum, struct tm * newConstraintDate){
 	Constraint * newConstraint = new Constraint; // Allocate new constraint
 	newConstraint->setConstraint(newConstraintName, newConstraintNum, newConstraintDate); // Fill constraint 
 	constraints.push_back(newConstraint); // Add pointer to constraint* vector
-	
-	return;
 }
 
 
@@ -197,35 +178,6 @@ DBInterface::~DBInterface() {
 	PQfinish(conn);
 }
 
-
-/*bool DBInterface::getFGA(DBReq * req, DBRes * res){
-	// Set query
-    std::string queryStr = "SELECT count(event_type) FROM pbp WHERE event_type = 'shot' AND player = ";
-    queryStr += std::to_string(req->getPID(0));
-    queryStr += " GROUP BY player";
-
-	// Execute query
-    PGresult * slctRes = PQexec(conn, queryStr.c_str());
-
-	// Get FGA out of query result
-    char * dbResult = PQgetvalue(slctRes, 0, 0);
-	if (PQntuples(slctRes) <= 0){
-		return false;
-	}
-	
-    char * resStr = new char[256];
-    strcpy(resStr, dbResult);
-
-	// Place FGA in resFloat 
-    double resFloat = atof(resStr);
-
-	// add to DBRes 
-    res->addPlayerRes(req->getPID(0), resFloat);
-
-    delete [] resStr;
-    return true;
-}*/
-
 bool DBInterface::getDataFromDB(DBReq * req, DBRes * res){
 	// Build query (THIS CONSTRUCTOR CONTAINS HARD-CODED LOGIC BETWEEN PROGRAM AND TABLE/COLUMN NAMES IN DATABASE)
 	Query * qry = new Query(req);
@@ -262,76 +214,147 @@ void DBInterface::fillRes(DBRes * res, PGresult * slctRes){
 }
 
 Query::Query(DBReq * req){
-	queryStr = "SELECT player, ";
-	fromStr = " FROM pbp";
-	whereStr = "WHERE ";
-	groupStr = "GROUP BY ";
+	queryStr = "SELECT";
+	joinStrs = new std::vector<std::string>;
+	onStrs = new std::vector<std::string>;
+	fromStr = " FROM";
+	whereStr = "WHERE";
+	groupStr = "GROUP BY";
 
 	// Call functions to build up query 
 	buildQueryFromReq(req);
 }
 
 Query::~Query(){
-	
+	delete joinStrs;
+	delete onStrs;
 }
 
 // HARD-CODED LOGIC FOR HOW STAT CATEGORIES ARE PULLED FROM DB 
 void Query::buildQueryFromReq(DBReq * req){
-	std::string cats[9] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers"};
+	std::string cats[11] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers", "offPlays", "defPlays"};
+	std::string constraints[6] = {"playerOnCourt", "playerOffCourt", "startDate", "endDate", "playerTeam", "playerOpponent"};
 	
-	// Loop over req PIDs to add them all to where clause
-	whereStr += "("; // Open parentheses since all PID's are OR'd together in parentheses
-	whereStr += "player = ";
-	whereStr += std::to_string(req->getPID(0));
-	for (int i = 1; i < req->getNumPIDs(); i++){
-		whereStr += " OR player = ";
-		whereStr += std::to_string(req->getPID(i));
-	}
-	whereStr += ")";
+	bool joined[15] = {false}; // bool array to mark whether a particular table has been joined into query
+		// 0 = games, 1 = plays, 2 = on_court_players, 3 = players, 4 = teams, 5 = player_team, 
+		// 6 = jump_balls, 7 = shots, 8 = turnovers, 9 = rebounds, 10 = free_throws, 
+		// 11 = fouls, 12 = ejections, 13 = subs, 14 = timeouts, 15 = violations 
 	
 	
-	// Loop over req categories, adding to various query strings
-	for (int i = 0; i < req->getNumCategories(); i++){
-		// switch over all possible categories
-		if (req->getCategory(i) == cats[0]){
-			queryStr += "count(event_type)";
-			whereStr += " AND (event_type = 'shot' OR event_type = 'miss')";
-			groupStr += "player";
-		} else if (req->getCategory(i) == cats[1]){
-			queryStr += "count(event_type)";
-			whereStr += " AND event_type = 'shot'";
-			groupStr += "player";
-		} else if (req->getCategory(i) == cats[2]){
-			
-		} else if (req->getCategory(i) == cats[3]){
-			
-		} else if (req->getCategory(i) == cats[4]){
-			
-		} else if (req->getCategory(i) == cats[5]){
-			
-		} else if (req->getCategory(i) == cats[6]){
-			
-		} else if (req->getCategory(i) == cats[7]){
-			
-		} else if (req->getCategory(i) == cats[8]){
-			
-		} else if (req->getCategory(i) == cats[9]){
-			
-		}
+	// **need to proxy tables (at least on_court_players, since I can join that multiple times)**
+	// switch over all possible categories
+	if (req->getCategory() == cats[0]){
+		queryStr += " count(event_type)";
+		fromStr += " plays";
+		joinStr.push_back("INNER JOIN shots");
+		onStr.push_back(" plays.game_id = shots.game_id AND plays.play_id = shots.play_id");
+		whereStr += " shots.player = ";
+		whereStr += std::to_string(req->getPID());
+		whereStr += " AND (plays.event_type = 'shot' OR plays.event_type = 'miss')";
+		groupStr += " shots.player";
+	} else if (req->getCategory() == cats[1]){
+
+	} else if (req->getCategory() == cats[2]){
+		
+	} else if (req->getCategory() == cats[3]){
+		
+	} else if (req->getCategory() == cats[4]){
+		
+	} else if (req->getCategory() == cats[5]){
+		
+	} else if (req->getCategory() == cats[6]){
+		
+	} else if (req->getCategory() == cats[7]){
+		
+	} else if (req->getCategory() == cats[8]){
+		
+	} else if (req->getCategory() == cats[9]){
+		
+	} else if (req->getCategory() == cats[10]){ // Need to join liek 5 tables here to get offensive plays from team that player is on while player is on court
+		queryStr += " count(event_type)";
+		fromStr += " plays";
+		
+		// Join on_court_players 
+		joinStr.push_back("INNER JOIN on_court_players");
+		onStrs.push_back("ON plays.game_id = on_court_players.game_id AND plays.play_id = on_court_players.play_id");
+		// Join games (for home/away team)
+		joinStr.push_back("INNER JOIN games");
+		onStrs.push_back("ON plays.game_id = games.game_id");
+		// Join fouls (for checking offensive vs defensive fouls when counting offensive plays)
+		joinStrs.push_back("LEFT JOIN fouls");
+		onStrs.push_back("ON plays.game_id = fouls.game_id AND plays.play_id = fouls.play_id");
+		
+		// where player is on court 
+		whereStr += " on_court_players.player_id = ";
+		whereStr += std::to_string(req->getPID());
+		
+		// And player's team takes action
+		whereStr += " AND (((plays.team_id = games.home_team AND on_court_players.home_team = true) "; // home team takes action and player is home team 
+		whereStr += "OR (plays.team_id = games.away_team AND on_court_players.home_team = false)) "; // or away team takes action and player is away team 
+		whereStr += "AND (plays.event_type = 'shot' OR plays.event_type = 'miss' OR plays.event_type = 'turnover') "; // actions where team is team on offense
+		whereStr += "OR (plays.event_type = 'foul' AND fouls.offensive = false AND ((plays.team_id = games.home_team AND on_court_players.home_team = true) "; // foul team is team that commits foul, so we want the foul to be defensive and the team fouling the opposite of the player's team fror whom we are counting plays 
+		whereStr += "OR (plays.team_id = games.away_team AND on_court_players.home_team = false)))"; // so team fouling opposite of player team 
+		
+		groupStr += " on_court_players.player_id";
+	} else if (req->getCategory() == cats[11]){
+		
 	}
 	
 	// Loop over constraints, adding to various query strings
+	for (int i = 0; i < req->getNumConstraints(); i++){
+		if (req->getConstraint(i) == constraints[0]){
+			// Joins regardless of previous joins, 
+			// since multiple on court players is constructed with multiple joins of on_court_players table
+			joinStrs.push_back("INNER JOIN on_court_players");
+			onStrs.push_back("ON plays.game_id = on_court_players.game_id AND plays.play_id = on_court_players.play_id");
+			
+			whereStr += " AND on_court_players.player_id = ";
+			whereStr += std::to_string(req->getConstraintNum(i));
+		} else if (req->getConstraint(i) == constraints[1]){
+			// left join + where player_id from this join of on_court_players = NULL
+			// That combo will return only rows where player was off court (= oncourt NULL)
+			
+		} else if (req->getConstraint(i) == constraints[2]){
+			// Join games 
+			
+			std::string constrDate = getConstraintDate(i); // New function to write. i = constraint number 
+			whereStr += " AND g.date >= ";
+			whereStr += constrDate;
+		} else if (req->getConstraint(i) == constraints[3]){
+			// Join games 
+			
+			std::string constrDate = getConstraintDate(i); // New function to write. i = constraint number 
+			whereStr += " AND g.date <= ";
+			whereStr += constrDate;		
+		} else if (req->getConstraint(i) == constraints[4]){
+			// JOIN games table 
+			
+			// player home team and home team_id = passed in team_id
+			// OR player away team and away team_id = passed in away_id
+		} else if (req->getConstraint(i) == constraints[5]){
+			// JOIN games table
+			
+			// player home team and away team_id = passed in team_id
+			// OR player away team and home team_id = passed in team_id
+		}
+	}
 	
 } 
 
 std::string Query::createFullStr(){
 	std::string fullStr = queryStr;
 	fullStr += fromStr;
-	if (whereStr.length() > 6){
+	for (int i = 0; i < joinStrs.size(); i++){
+		fullStr += " ";
+		fullStr += joinStrs[i];
+		fullStr += " ";
+		fullStr += onStrs[i];
+	}
+	if (whereStr != "WHERE"){
 		fullStr += " ";
 		fullStr += whereStr;
 	}
-	if (groupStr.length() > 9){ // Should always be included if I'm always grouping by player?
+	if (groupStr != "GROUP BY"){ // Should always be included if I'm always grouping by player?
 		fullStr += " ";
 		fullStr += groupStr;
 	}
