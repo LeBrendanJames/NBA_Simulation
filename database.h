@@ -63,6 +63,7 @@ public:
     int getPID();
     std::string getCategory();
     void getConstraint(Constraint *, int); // Must pass in a struct tm pointer that will be filled with the information in this constraint
+	std::string getConstraintType(int);
 	int getConstraintNum(int constrNum); // Pass in which constraint, get back constraintNum for that one
 	std::string getConstraintDate(int constrNum); // Pass in which constraint, get back constraintDate for that one (as string, ready for SQL query)
 	
