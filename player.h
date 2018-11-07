@@ -21,6 +21,7 @@ private:
     DBInterface * db; // Pointer to DBInterface, which exposes connection and pre-written DB access functions 
 
 	// Percentages of how often a player finishes a team play (based on the 5 types of things that can happen - some offensive & some defensive)
+	// **Replace with AdvStats object**
     double shootPct;
 	double shoot3PtPct;
     double tovPct;
@@ -60,7 +61,7 @@ public:
 	// Destructor
     ~Player();
 
-	void calcStats(); // this will contain all the 'business logic' of how to calculate advanced stats that I need.
+	void calcPriors(); // this will contain all the 'business logic' of how to calculate advanced stats that I need.
     // It will make calls to underlying functions
 
     // Getters

@@ -15,3 +15,4 @@ Lineup::Lineup(Player * plyr1, Player * plyr2, Player * plyr3, Player * plyr4, P
 Lineup::~Lineup(){
 	delete [] this->lineup;
 }
+

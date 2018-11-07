@@ -273,6 +273,8 @@ void Query::buildQueryFromReq(DBReq * req){
 	buildConstrts(req, joined); // Function to build in constraints from DBReq
 } 
 
+//**In order to get constraints to work, I may need to structure all of the category stuff as a subquery**
+//**Then, constraints can just add on a where clause to the table returned from the subquery (and maybe what to SELECT)**
 void Query::buildCats(DBReq * req){
 	std::string cats[] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers", "offPlays", "defPlays"};
 
@@ -384,6 +386,66 @@ void Query::buildTOV(DBReq * req){
 void Query::buildOffPlays(DBReq * req){
 	// Need to join liek 5 tables here to get offensive plays from team that player is on while player is on court
     // https://dba.stackexchange.com/questions/87249/understanding-multiple-table-join-with-aggregation
+	// https://community.modeanalytics.com/sql/tutorial/sql-subqueries/
+	
+	// Looking for: Number of offensive plays where player was on court on offensive team 
+		// Want:
+			// 1. All offensive plays
+			// 2. Filtered to where player on court
+			// 3. Filtered to where player team = offensive play team 
+			
+			
+	SELECT * FROM nba_plays p WHERE p.event_type = 'shot' OR p.event_type = 'miss' OR p.event_type = 'turnover' OR p.event_type = 'foul' // Get Offensive Plays
+	
+	// ******************************************************************************************************************************************************************************************************************
+	SELECT * FROM (
+		(
+			(SELECT * FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
+			LEFT JOIN nba_fouls f
+				ON p.game_id = f.game_id AND p.play_id = f.game_id 
+		) AS play
+		INNER JOIN 
+			(SELECT * FROM nba_games  
+			INNER JOIN (SELECT * FROM on_court_players oc1 WHERE oc1.player_id = std::to_string(req->getPID())) AS oc 
+				ON oc.game_id = nba_games.game_id AND oc.play_id = nba_games.play_id
+			) AS g
+			ON play.game_id = g.game_id AND play.play_id = g.play_id AND 
+			( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+			OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+			) 
+	) cat // Will call whatever table is created 'cat', so that adding constraints code knows name of table 
+	// *******************************************************************************************************************************************************************************************************************
+	
+	
+	// 1. All offensive plays (shot, miss, turnover, defensive foul drawn)
+	SELECT * FROM nba_plays 
+	INNER JOIN (
+		// Selecting for fouls here  
+	) 
+	WHERE nba_plays.event_type = 'shot' or nba_plays.event_type = 'miss' or nba_plays.event_type = 'turnover' or nba_plays.event_type = 'foul'
+	// The above gets me to all offensive plays
+	// Then, make table with on_court_players and whether they were home or away team
+
+		
+		INNER JOIN 
+		// Get player I want and every play they were on court (cols = game_id, play_id, player_id, home_team) as well as game info tacked on the end 
+		(SELECT * FROM nba_games  
+		INNER JOIN (SELECT * FROM on_court_players oc1 WHERE oc1.player_id = std::to_string(req->getPID())) AS oc 
+			ON oc.game_id = nba_games.game_id AND oc.play_id = nba_games.play_id
+		) AS g
+		ON 
+	
+	
+	
+	
+	// Plain SQL
+	SELECT count(nba_plays.event_type) FROM nba_plays
+	INNER JOIN nba_on_court_players oc ON nba_plays.game_id = oc.game_id AND nba_plays.play_id = oc.play_id
+	INNER JOIN nba_games ON nba_plays.game_id = nba_games.game_id
+	LEFT JOIN nba_fouls ON nba_plays.game_id = nba_fouls.game_id AND nba_plays.play_id = nba_fouls.play_id 
+	
+	WHERE // Can only contain stuff from the original table in FROM clause (nba_plays)
+	
 
 	queryStr += " count(nba_plays.event_type)";
 	fromStr += " nba_plays";

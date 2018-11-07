@@ -98,7 +98,7 @@ int Player::getTotalFromDB(std::string category) {
 
 
 // Wrapper function that fills all stat data members of player object
-void Player::calcStats(){
+void Player::calcPriors(){ // Should take a game date?
 
     //int FGA = getFGAFromDB();
     int FGA = getTotalFromDB("FGA");

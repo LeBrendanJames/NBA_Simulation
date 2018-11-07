@@ -19,10 +19,11 @@ Game::Game(){
 	srand(time(NULL));
 }
 
-Game::Game(Lineup * homeLineup, Lineup * awayLineup){
+Game::Game(std::string homeTeam, std::string awayTeam, std::string gameDate){
 	this->homeLineup = homeLineup;
 	this->awayLineup = awayLineup;
 	
+	// Set initial game state 
 	homeTeamScore = 0;
 	awayTeamScore = 0;
 	quarter = 1;
@@ -65,6 +66,9 @@ int Game::simGame(){
 	// Return results up to another object or back out to main?
 	return homeTeamScore - awayTeamScore;
 }
+
+
+
 
 // This should be the function that houses all of the logic that i'll build up over time 
 void Game::determinePossOutcome(){

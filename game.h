@@ -8,17 +8,24 @@
 #include "lineup.h"
 #include "coach.h"
 
+
 class Game {
 private:
-	Lineup * homeLineup;
-	Lineup * awayLineup;
-	// Coach * homeCoach;
-	// Coach * awayCoach;
+	Team * homeTeam;
+	Team * awayTeam;
+	OnCourtPlayers * onCourtPlyrs;
+	// Lineup * homeLineup;
+	// Lineup * awayLineup;
+	Coach * homeCoach; // holds substitution patterns?
+	Coach * awayCoach;
 	
 	int homeTeamScore;
 	int awayTeamScore;
 	int quarter;
 	int timeRemaining; // Seconds left in quarter 
+	
+	// gameDate?
+	// gameLocation?
 	
 	void determinePossOutcome(); // Function to take in all info and determine the outcome of a possession
 								 // This will rely on the underlying lineups and eventually coaches + game state + meta-game considerations (home/away, travel, etc.) 
@@ -29,7 +36,7 @@ private:
 	
 public:
 	Game();
-	Game(Lineup *, Lineup *)
+	Game(std::string homeTeam, std::string awayTeam)
 	~Game();
 	
 	int simGame(); // Manage game state, calling determinePossOutcome() for each possession

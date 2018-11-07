@@ -17,7 +17,7 @@ class Lineup {
 		Lineup(Player *, Player *, Player *, Player *, Player *);
 		~Lineup();
 		
-		//void calcLineupStats(); // Calc stats, which get placed in each individual players stat categories
+		//void calcLineupStats(Lineup * oppLineup); // Calc stats, which get placed in each individual players stat categories
 		//void subPlayers(Player * playerOn, Player * playerOff); // Changes pointers in lineup variable and re-calcs all of the lineup stats based on new lineup 
 	
 };
