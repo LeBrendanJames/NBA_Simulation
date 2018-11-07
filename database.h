@@ -11,6 +11,7 @@
 #include <libpq-fe.h>
 #include <string>
 #include <vector>
+#include <deque>
 
 
 
@@ -77,7 +78,7 @@ public:
 // RESPONSE
 
 
-class PlayerRes{
+class PlayerRes {
 private:
 	// PlayerID
 	int pID;
@@ -117,7 +118,7 @@ public:
     void getPlayerRes(PlayerRes *, int);
 	
 	// Setter 
-    void addPlayerRes(int);
+    void addPlayerRes();
 	void addPlayerResVal(double);
 };
 
@@ -149,18 +150,34 @@ public:
 class Query {
 private:
 	std::string queryStr;
-	std::vector<std::string> * joinStrs; // Can be multiple joins, so store in vector
-	std::vector<std::string> * onStr; // Can be multiple joins, so store in vector
+	std::deque<std::string> * joinStrs; // Can be multiple joins, so store in vector
+	std::deque<std::string> * onStrs; // Can be multiple joins, so store in vector
 	std::string fromStr;
 	std::string whereStr;
 	std::string groupStr;
 	
 	void buildQueryFromReq(DBReq *);
-	
+
+	void buildCats(DBReq *);
+	void buildConstrts(DBReq *, bool *);
+
+	void buildFGA(DBReq *);
+	void buildFGM(DBReq *);
+	void build3PA(DBReq *);
+	void build3PM(DBReq *);
+	void buildDREB(DBReq *);
+	void buildOREB(DBReq *);
+	void buildSTL(DBReq *);
+	void buildBLK(DBReq *);
+	void buildTOV(DBReq *);
+	void buildOffPlays(DBReq *);
+	void buildDefPlays(DBReq *);
+
 public:
 	Query(DBReq *);
 	~Query();
 
+	//std::string getConstraintDate(DBReq *, int); // Already written as a function within DBReq
 	std::string createFullStr();
 };
 

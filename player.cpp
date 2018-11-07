@@ -73,11 +73,17 @@ int Player::getTotalFromDB(std::string category) {
 		// Throw error & return -1?
 	}
 
+	std::cout << "About to create temp playerRes." << std::endl;
+
     // get Player Res from res object
     PlayerRes * plyrRes = new PlayerRes;
     res->getPlayerRes(plyrRes, 0);
+    std::cout << "through getPlayerRes." << std::endl;
+    std::cout << "resVals size: " << plyrRes->getResValsSize() << std::endl;
 	int retVal = static_cast<int>(plyrRes->getResVal(0));
-	
+
+	std::cout << "retVal in player.getTotalFromDB: " << retVal << std::endl;
+
 	// Delete plyrRes
 	delete plyrRes;
 	
@@ -109,7 +115,7 @@ void Player::calcStats(){
 	int TOV = getTotalFromDB("Turnovers");
 	
 	int offPlays = getTotalFromDB("offPlays");
-	int defPlays = getTotalFromDb("defPlays");
+	int defPlays = getTotalFromDB("defPlays");
 
 	//std::cout << "FGA = " << FGA << std::endl;
 	//std::cout << "FGM = " << FGM << std::endl;
