@@ -415,7 +415,57 @@ void Query::buildOffPlays(DBReq * req){
 			) 
 	) cat // Will call whatever table is created 'cat', so that adding constraints code knows name of table 
 	// *******************************************************************************************************************************************************************************************************************
-	
+
+    // ****WORKS IN PGADMIN****
+    SELECT count(event_type) FROM (
+    (SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM
+            (SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
+    LEFT JOIN nba_fouls f
+    ON p.game_id = f.game_id AND p.play_id = f.play_id
+    ) AS play
+    INNER JOIN
+    (SELECT game.game_id, game.home_team_id, game.home_team, game.play_id, game.away_team FROM
+            (SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games
+    INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
+    ON oc.game_id = nba_games.game_id
+    ) game
+    ) AS g
+    ON play.game_id = g.game_id AND play.play_id = g.play_id AND
+    ( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+    OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+    )
+    ) cat
+    //******************************************
+
+
+    //********************************************
+    //WORKS IN PGADMIN WITH A JOIN FOR ONCOURT PLAYER AT BOTTOM
+    SELECT * FROM (
+    SELECT COALESCE(play.game_id, g.game_id) as game_id, COALESCE(play.play_id, g.play_id) as play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (
+            (SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM
+            (SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
+    LEFT JOIN nba_fouls f
+    ON p.game_id = f.game_id AND p.play_id = f.play_id
+    ) AS play
+    INNER JOIN
+    (SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games
+    INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
+    ON oc.game_id = nba_games.game_id
+    ) AS g
+    ON play.game_id = g.game_id AND play.play_id = g.play_id AND
+    ( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+    OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+    )
+    )
+    ) cat
+    INNER JOIN (
+            SELECT * FROM nba_on_court_players oc2
+    WHERE player_id = 462
+    ) oncourt2
+    ON cat.game_id = oncourt2.game_id AND cat.play_id = oncourt2.play_id
+    //*******************************************************************************8
+
+
 	
 	// 1. All offensive plays (shot, miss, turnover, defensive foul drawn)
 	SELECT * FROM nba_plays 
