@@ -241,7 +241,7 @@ void DBInterface::fillRes(DBRes * res, PGresult * slctRes){
 }
 
 Query::Query(DBReq * req){
-	queryStr = "SELECT";
+	queryStr = "SELECT count(event_type) FROM (";
 	joinStrs = new std::deque<std::string>;
 	onStrs = new std::deque<std::string>;
 	fromStr = " FROM";
@@ -304,83 +304,60 @@ void Query::buildCats(DBReq * req){
 }
 
 void Query::buildFGA(DBReq * req){
-	queryStr += " count(nba_shots.event_type)";
-	fromStr += " nba_shots";
-	whereStr += " nba_shots.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND (nba_shots.event_type = 'shot' OR nba_shots.event_type = 'miss')";
-	groupStr += " nba_shots.player";
+	catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND (event_type = 'shot' OR event_type = 'miss')";
 }
 
 void Query::buildFGM(DBReq * req){
-	queryStr += " count(nba_shots.event_type)";
-	fromStr += " nba_shots";
-	whereStr += " nba_shots.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND nba_shots.event_type = 'shot'";
-	groupStr += " nba_shots.player";
+	catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND event_type = 'shot'";
 }
 
 void Query::build3PA(DBReq * req){
-	queryStr += " count(nba_shots.event_type)";
-	fromStr += " nba_shots";
-	whereStr += " nba_shots.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND (nba_shots.event_type = 'shot' OR nba_shots.event_type = 'miss')";
-	whereStr += " AND nba_shots.three_pointer = true"; // THIS IS ONLY ADDED LINE TO FGA
-	groupStr += " nba_shots.player";
+	catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND (event_type = 'shot' OR event_type = 'miss')";
+	catStr += " AND three_pointer = true";
 }
 
 void Query::build3PM(DBReq * req){
-	queryStr += " count(nba_shots.event_type)";
-	fromStr += " nba_shots";
-	whereStr += " nba_shots.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND nba_shots.event_type = 'shot'";
-	whereStr += " AND nba_shots.three_pointer = true"; // THIS IS ONLY ADDED LINE TO FGM
-	groupStr += " nba_shots.player";
+	catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND event_type = 'shot'";
+	catStr += " AND three_pointer = true";
 }
 
 void Query::buildDREB(DBReq * req){
-	queryStr += " count(nba_rebounds.player)";
-	fromStr += " nba_rebounds";
-	whereStr += " nba_rebounds.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND nba_rebounds.defensive = true";
-	groupStr += " nba_rebounds.player";
+	// Renaming player to event_type is a little bit of a hack to build larger queries where I know I'll just be selecting the count
+	catStr += "SELECT game_id, play_id, player as event_type FROM nba_shots WHERE event_type = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND defensive = true"
 }
 
 void Query::buildOREB(DBReq * req){
-	queryStr += " count(nba_rebounds.player)";
-	fromStr += " nba_rebounds";
-	whereStr += " nba_rebounds.player = ";
-	whereStr += std::to_string(req->getPID());
-	whereStr += " AND nba_rebounds.defensive = false";
-	groupStr += " nba_rebounds.player";
+	// Renaming player to event_type is a little bit of a hack to build larger queries where I know I'll just be selecting the count
+	catStr += "SELECT game_id, play_id, player as event_type FROM nba_shots WHERE event_type = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND defensive = false"
 }
 
 void Query::buildSTL(DBReq * req){
-	queryStr += " count(nba_turnovers.steal_player)";
-	fromStr += " nba_turnovers";
-	whereStr += " nba_turnovers.steal_player = ";
-	whereStr += std::to_string(req->getPID());
-	groupStr += " nba_turnovers.steal_player";
+	// Renaming steal_player to event_type is a little bit of a hack to build larger queries where I know I'll just be selecting the count
+	catStr += "SELECT game_id, play_id, steal_player as event_type FROM nba_turnovers WHERE event_type = ";
+	catStr += std::to_string(req->getPID());
 }
 
 void Query::buildBLK(DBReq * req){
-	queryStr += " count(nba_shots.block_player)";
-	fromStr += " nba_shots";
-	whereStr += " nba_shots.block_player = ";
-	whereStr += std::to_string(req->getPID());
-	groupStr += " nba_shots.block_player";
+	catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE block_player = ";
+	catStr += std::to_string(req->getPID());
 }
 
 void Query::buildTOV(DBReq * req){
-	queryStr += " count(nba_turnovers.player)";
-	fromStr += " nba_turnovers";
-	whereStr += " nba_turnovers.player = ";
-	whereStr += std::to_string(req->getPID());
-	groupStr += " nba_turnovers.player";
+	// Renaming player to event_type is a little bit of a hack to build larger queries where I know I'll just be selecting the count
+	catStr += "SELECT game_id, play_id, player as event_type FROM nba_turnovers WHERE event_type = ";
+	catStr += std::to_string(req->getPID());
 }
 
 void Query::buildOffPlays(DBReq * req){
@@ -388,289 +365,244 @@ void Query::buildOffPlays(DBReq * req){
     // https://dba.stackexchange.com/questions/87249/understanding-multiple-table-join-with-aggregation
 	// https://community.modeanalytics.com/sql/tutorial/sql-subqueries/
 	
-	// Looking for: Number of offensive plays where player was on court on offensive team 
-		// Want:
-			// 1. All offensive plays
-			// 2. Filtered to where player on court
-			// 3. Filtered to where player team = offensive play team 
-			
-			
-	SELECT * FROM nba_plays p WHERE p.event_type = 'shot' OR p.event_type = 'miss' OR p.event_type = 'turnover' OR p.event_type = 'foul' // Get Offensive Plays
-	
-	// ******************************************************************************************************************************************************************************************************************
-	SELECT * FROM (
-		(
-			(SELECT * FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
-			LEFT JOIN nba_fouls f
-				ON p.game_id = f.game_id AND p.play_id = f.game_id 
-		) AS play
-		INNER JOIN 
-			(SELECT * FROM nba_games  
-			INNER JOIN (SELECT * FROM on_court_players oc1 WHERE oc1.player_id = std::to_string(req->getPID())) AS oc 
-				ON oc.game_id = nba_games.game_id AND oc.play_id = nba_games.play_id
-			) AS g
-			ON play.game_id = g.game_id AND play.play_id = g.play_id AND 
-			( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-			OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-			) 
-	) cat // Will call whatever table is created 'cat', so that adding constraints code knows name of table 
-	// *******************************************************************************************************************************************************************************************************************
-
-    // ****WORKS IN PGADMIN****
-    SELECT count(event_type) FROM (
-    (SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM
-            (SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
-    LEFT JOIN nba_fouls f
-    ON p.game_id = f.game_id AND p.play_id = f.play_id
-    ) AS play
-    INNER JOIN
-    (SELECT game.game_id, game.home_team_id, game.home_team, game.play_id, game.away_team FROM
-            (SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games
-    INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
-    ON oc.game_id = nba_games.game_id
-    ) game
-    ) AS g
-    ON play.game_id = g.game_id AND play.play_id = g.play_id AND
-    ( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-    OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-    )
-    ) cat
-    //******************************************
+	catStr += "SELECT play.game_id, play.play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (";
+	catStr += "(SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM ";
+	catStr += "(SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p ";
+	catStr += "LEFT JOIN nba_fouls f ";
+	catStr += "ON p.game_id = f.game_id AND p.play_id = f.play_id ";
+	catStr += " INNER JOIN (";
+	catStr += "SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games ";
+	catStr += "INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = ";
+	catStr += std::to_string(req->getPID());
+	catStr += ") AS oc ";
+	catStr += "ON oc.game_id = nba_games.game_id";
+	catStr += ") AS g ";
+	catStr += "ON play.game_id = g.game_id AND play.play_id = g.play_id AND ";
+	catStr += "( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false))) ";
+	catStr += "OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))";
+	catStr += ")";
+	catStr += ")";
 
 
+	/*
     //********************************************
     //WORKS IN PGADMIN WITH A JOIN FOR ONCOURT PLAYER AT BOTTOM
     SELECT * FROM (
-    SELECT COALESCE(play.game_id, g.game_id) as game_id, COALESCE(play.play_id, g.play_id) as play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (
+	SELECT COALESCE(play.game_id, g.game_id) as game_id, COALESCE(play.play_id, g.play_id) as play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (
             (SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM
             (SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
-    LEFT JOIN nba_fouls f
-    ON p.game_id = f.game_id AND p.play_id = f.play_id
-    ) AS play
-    INNER JOIN
-    (SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games
-    INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
-    ON oc.game_id = nba_games.game_id
-    ) AS g
-    ON play.game_id = g.game_id AND play.play_id = g.play_id AND
-    ( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-    OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
-    )
+		LEFT JOIN nba_fouls f
+		ON p.game_id = f.game_id AND p.play_id = f.play_id
+		) AS play
+		INNER JOIN (
+			SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games
+			INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
+			ON oc.game_id = nba_games.game_id
+		) AS g
+		ON play.game_id = g.game_id AND play.play_id = g.play_id AND
+			( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+			OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = true) OR (play.team_id = g.away_team AND g.home_team = false)))
+			)
     )
     ) cat
+	//*********************************************
     INNER JOIN (
-            SELECT * FROM nba_on_court_players oc2
-    WHERE player_id = 462
+        SELECT * FROM nba_on_court_players oc2
+		WHERE player_id = 462
     ) oncourt2
     ON cat.game_id = oncourt2.game_id AND cat.play_id = oncourt2.play_id
-    //*******************************************************************************8
+    //*******************************************************************************
+	*/
 
-
-	
-	// 1. All offensive plays (shot, miss, turnover, defensive foul drawn)
-	SELECT * FROM nba_plays 
-	INNER JOIN (
-		// Selecting for fouls here  
-	) 
-	WHERE nba_plays.event_type = 'shot' or nba_plays.event_type = 'miss' or nba_plays.event_type = 'turnover' or nba_plays.event_type = 'foul'
-	// The above gets me to all offensive plays
-	// Then, make table with on_court_players and whether they were home or away team
-
-		
-		INNER JOIN 
-		// Get player I want and every play they were on court (cols = game_id, play_id, player_id, home_team) as well as game info tacked on the end 
-		(SELECT * FROM nba_games  
-		INNER JOIN (SELECT * FROM on_court_players oc1 WHERE oc1.player_id = std::to_string(req->getPID())) AS oc 
-			ON oc.game_id = nba_games.game_id AND oc.play_id = nba_games.play_id
-		) AS g
-		ON 
-	
-	
-	
-	
-	// Plain SQL
-	SELECT count(nba_plays.event_type) FROM nba_plays
-	INNER JOIN nba_on_court_players oc ON nba_plays.game_id = oc.game_id AND nba_plays.play_id = oc.play_id
-	INNER JOIN nba_games ON nba_plays.game_id = nba_games.game_id
-	LEFT JOIN nba_fouls ON nba_plays.game_id = nba_fouls.game_id AND nba_plays.play_id = nba_fouls.play_id 
-	
-	WHERE // Can only contain stuff from the original table in FROM clause (nba_plays)
-	
-
-	queryStr += " count(nba_plays.event_type)";
-	fromStr += " nba_plays";
-
-	// Join on_court_players
-	joinStrs->push_back("INNER JOIN nba_on_court_players oc");
-	onStrs->push_back("ON nba_plays.game_id = nba_on_court_players.game_id AND nba_plays.play_id = nba_on_court_players.play_id");
-    // Join games (for home/away team)
-	joinStrs->push_back("INNER JOIN nba_games");
-	onStrs->push_back("ON nba_plays.game_id = nba_games.game_id");
-	// Join fouls (for checking offensive vs defensive fouls when counting offensive plays)
-	joinStrs->push_back("LEFT JOIN nba_fouls");
-	onStrs->push_back("ON nba_plays.game_id = nba_fouls.game_id AND nba_plays.play_id = nba_fouls.play_id");
-
-	// where player is on court
-    // whereStr += " nba_on_court_players.player_id = ";
-    whereStr += " oc.player_id = ";
-	whereStr += std::to_string(req->getPID());
-
-	// And player's team takes action
-	whereStr += " AND (((nba_plays.team_id = nba_games.home_team AND nba_on_court_players.home_team = true) "; // home team takes action and player is home team
-	whereStr += "OR (nba_plays.team_id = nba_games.away_team AND nba_on_court_players.home_team = false)) "; // or away team takes action and player is away team
-	whereStr += "AND ((nba_plays.event_type = 'shot' OR nba_plays.event_type = 'miss' OR nba_plays.event_type = 'turnover') "; // actions where team is team on offense
-	whereStr += "OR (nba_plays.event_type = 'foul' AND nba_fouls.offensive = false AND ((nba_plays.team_id = nba_games.home_team AND nba_on_court_players.home_team = true) "; // foul team is team that commits foul, so we want the foul to be defensive and the team fouling the opposite of the player's team fror whom we are counting plays
-	whereStr += "OR (nba_plays.team_id = nba_games.away_team AND nba_on_court_players.home_team = false)))))"; // so team fouling opposite of player team
-
-	groupStr += " nba_on_court_players.player_id";
 }
 
 void Query::buildDefPlays(DBReq * req){
-	queryStr += " count(nba_plays.event_type)";
-	fromStr += " nba_plays";
-
-	// Join on_court_players
-	joinStrs->push_back("INNER JOIN nba_on_court_players");
-	onStrs->push_back("ON nba_plays.game_id = nba_on_court_players.game_id AND nba_plays.play_id = nba_on_court_players.play_id");
-	// Join games (for home/away team)
-	joinStrs->push_back("INNER JOIN nba_games");
-	onStrs->push_back("ON nba_plays.game_id = nba_games.game_id");
-	// Join fouls (for checking offensive vs defensive fouls when counting offensive plays)
-	joinStrs->push_back("LEFT JOIN nba_fouls");
-	onStrs->push_back("ON nba_plays.game_id = nba_fouls.game_id AND nba_plays.play_id = nba_fouls.play_id");
-
-	// where player is on court
-	whereStr += " nba_on_court_players.player_id = ";
-	whereStr += std::to_string(req->getPID());
-
-	// And opponent takes action
-	whereStr += " AND (((nba_plays.team_id = nba_games.home_team AND nba_on_court_players.home_team = false) "; // home team takes action and player is away team
-	whereStr += "OR (nba_plays.team_id = nba_games.away_team AND nba_on_court_players.home_team = true)) "; // or away team takes action and player is home team
-	whereStr += "AND (nba_plays.event_type = 'shot' OR nba_plays.event_type = 'miss' OR nba_plays.event_type = 'turnover') "; // actions where team is team on offense
-	whereStr += "OR (nba_plays.event_type = 'foul' AND nba_fouls.offensive = false AND ((nba_plays.team_id = nba_games.home_team AND nba_on_court_players.home_team = false) "; // foul team is team that commits foul, so we want the foul to be defensive and the team fouling the player's team for whom we are counting plays
-	whereStr += "OR (nba_plays.team_id = nba_games.away_team AND nba_on_court_players.home_team = true)))"; // so team fouling same as player team
-
-	groupStr += " nba_on_court_players.player_id";
+	//**BASICALLY ONLY CHANGE FROM OFFENSIVE IS TO FLIP g.home_team = true/false it the bottom two full lines of SQL**
+	
+	catStr += "SELECT play.game_id, play.play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (";
+	catStr += "(SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM ";
+	catStr += "(SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p ";
+	catStr += "LEFT JOIN nba_fouls f ";
+	catStr += "ON p.game_id = f.game_id AND p.play_id = f.play_id ";
+	catStr += " INNER JOIN (";
+	catStr += "SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team FROM nba_games ";
+	catStr += "INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = ";
+	catStr += std::to_string(req->getPID());
+	catStr += ") AS oc ";
+	catStr += "ON oc.game_id = nba_games.game_id";
+	catStr += ") AS g ";
+	catStr += "ON play.game_id = g.game_id AND play.play_id = g.play_id AND ";
+	catStr += "( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = false) OR (play.team_id = g.away_team AND g.home_team = true))) ";
+	catStr += "OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = false) OR (play.team_id = g.away_team AND g.home_team = true)))";
+	catStr += ")";
+	catStr += ")";
+	
+	/*
+	//********************************************************************************************
+	SELECT play.game_id, play.play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (
+            (SELECT p.game_id, p.play_id, p.team_id, p.event_type, f.offensive FROM
+            (SELECT q.game_id, q.play_id, q.team_id, q.event_type FROM nba_plays q WHERE q.event_type = 'shot' OR q.event_type = 'miss' OR q.event_type = 'turnover' OR q.event_type = 'foul') p
+		LEFT JOIN nba_fouls f
+		ON p.game_id = f.game_id AND p.play_id = f.play_id
+		) AS play
+		INNER JOIN (
+			SELECT nba_games.game_id, nba_games.home_team as home_team_id, oc.home_team, oc.play_id, nba_games.away_team as away_team_id FROM nba_games
+			INNER JOIN (SELECT * FROM nba_on_court_players oc1 WHERE oc1.player_id = 196) AS oc
+			ON oc.game_id = nba_games.game_id
+		) AS g
+		ON play.game_id = g.game_id AND play.play_id = g.play_id AND
+			( ((play.event_type = 'shot' OR play.event_type = 'miss' OR play.event_type = 'turnover') AND ((play.team_id = g.home_team_id AND g.home_team = false) OR (play.team_id = g.away_team_id AND g.home_team = true)))
+			OR ((play.event_type = 'foul' AND play.offensive = false) AND ((play.team_id = g.home_team_id AND g.home_team = false) OR (play.team_id = g.away_team_id AND g.home_team = true)))
+			)
+    )
+	//******************************************************************************************
+	*/
+	
 }
 
 
 
-void Query::buildConstrts(DBReq * req, bool * joined){
+void Query::buildConstrts(DBReq * req){
 	std::string constraints[] = {"playerOnCourt", "playerOffCourt", "startDate", "endDate",
 								 "playerTeam", "playerOpponent", "normalPoss"};
 
-	int onCourtCount = 1; // count of how many times on_court_players has been joined
-		// Important for putting in table proxies programatically each time.
-		// Uses this number to make them all different
-
-	// 1st thing to do is to join plays (if it hasn't been already), as all joins below join onto plays table
-	if (joined[1] == false && req->getNumConstraints() > 0){ // only joining if I'm adding constraints and it hasn't been joined yet
-		joinStrs->push_back("INNER JOIN nba_plays");
-		onStrs->push_back("ON nba_plays.game_id = t.game_id AND nba_plays.play_id = t.game_id"); // Calling original table t
-		joined[1] = true;
-	}
-
 	for (int i = 0; i < req->getNumConstraints(); i++){
+		// Call functions to build subquery strings (just the subquery - joining handled seperately)
 		if (req->getConstraintType(i) == constraints[0]){
-			// Joins regardless of previous joins,
-			// since multiple on court players is constructed with multiple joins of on_court_players table.
-
-			std::string proxyStmt = "oc" + std::to_string(onCourtCount); // Proxy == oc1, oc2, ..., depending on onCourtCount
-
-			std::string joinStmt = "INNER JOIN nba_on_court_players ";
-			joinStmt += proxyStmt;
-			onCourtCount++; // so that proxy is 1 higher next time
-			joinStrs->push_back(joinStmt);
-
-			std::string onStmt = "ON nba_plays.game_id = " + proxyStmt + ".game_id AND nba_plays.play_id = " + proxyStmt + ".play_id";
-			onStrs->push_back(onStmt);
-
-			whereStr += " AND ";
-			whereStr += proxyStmt;
-			whereStr += ".player_id = ";
-			whereStr += std::to_string(req->getConstraintNum(i));
+			buildPlayerOnCourt(req, i); // 'i' needed so that I can place the resulting string in the constraintStr array
 		} else if (req->getConstraintType(i) == constraints[1]){
-			// left join + where player_id from this join of on_court_players = NULL
-			// That combo will return only rows where player was off court (= oncourt NULL)
-			std::string proxyStmt = "oc" + std::to_string(onCourtCount);
-
-			std::string subQuery = "LEFT JOIN (SELECT nba_on_court_players.game_id, nba_on_court_players.play_id, nba_on_court_players.player_id";
-			subQuery += " FROM nba_on_court_players WHERE player_id = ";
-			subQuery += std::to_string(req->getPID());
-			subQuery += ") as ";
-			subQuery += proxyStmt;
-
-			joinStrs->push_back(subQuery);
-
-			std::string onStmt = "ON nba_plays.game_id = " + proxyStmt + ".game_id AND nba_plays.play_id = " + proxyStmt + ".play_id";
-			onStrs->push_back(onStmt);
-
-			whereStr += " AND " + proxyStmt + ".player_id = NULL";
-
+			buildPlayerOffCourt(req, i);
 		} else if (req->getConstraintType(i) == constraints[2]){
-			// Join games
-			if (joined[0] == false){
-				joinStrs->push_back("INNER JOIN nba_games g");
-				onStrs->push_back("ON nba_plays.game_id = g.game_id");
-			}
-
-			whereStr += " AND g.date >= ";
-			whereStr += req->getConstraintDate(i); // getConstraintDate returns date as string
+			buildStartDate(req, i);
 		} else if (req->getConstraintType(i) == constraints[3]){
-			// Join games
-			if (joined[0] == false){
-				joinStrs->push_back("INNER JOIN nba_games g");
-				onStrs->push_back("ON nba_plays.game_id = g.game_id");
-			}
-
-			std::string constrDate = req->getConstraintDate(i); // New function to write. i = constraint number
-			whereStr += " AND g.date <= ";
-			whereStr += constrDate;
+			buildEndDate(req, i);
 		} else if (req->getConstraintType(i) == constraints[4]){
-			// JOIN games table
-			if (joined[0] == false){
-				joinStrs->push_back("INNER JOIN nba_games g");
-				onStrs->push_back("ON nba_plays.game_id = g.game_id");
-			}
-
-			// player home team and home team_id = passed in team_id
-			// OR player away team and away team_id = passed in away_id
+			buildPlayerTeam(req, i);
 		} else if (req->getConstraintType(i) == constraints[5]){
-			// JOIN games table
-			if (joined[0] == false){
-				joinStrs->push_back("INNER JOIN nba_games g");
-				onStrs->push_back("ON nba_plays.game_id = g.game_id");
-			}
-
-			// player home team and away team_id = passed in team_id
-			// OR player away team and home team_id = passed in team_id
+			buildPlayerOpponent(req, i);
 		} else if (req->getConstraintType(i) == constraints[6]){
-			// normalPoss filters out end of quarter heaves, blowouts, ATO's, and end of game fouling situations
-
+			buildNormalPoss(req, i);
 		}
 	}
 }
 
-std::string Query::createFullStr(){
-	std::string fullStr = queryStr;
-	fullStr += fromStr;
-	while (!joinStrs->empty()){ // Will successively pop of front value of joinStrs and onStrs into fullStr
-	//for (int i = 0; i < joinStrs->size(); i++){
-		fullStr += " ";
-		fullStr += joinStrs->front();
-		joinStrs->pop_front();
-		fullStr += " ";
-		fullStr += onStrs->front();
-		onStrs->pop_front();
+void Query::buildPlayerOnCourt(DBReq * req, int i){
+	// join with nba_on_court_players where PID is on court
+	// SELECT game_id, play_id FROM nba_on_court_players oncourt WHERE oncourt.player_id = [num] 
+	constraintStr[i] += "SELECT game_id, play_id FROM nba_on_court_players oncourt WHERE oncourt.player_id = ";
+	constraintStr[i] += req->getConstraintNum(i); 
+}
+
+void Query::buildPlayerOffCourt(DBReq * req, int i){
+	// join with nba_on_court_players where PID is not on court
+	// SELECT game_id, play_id FROM nba_on_court_players offcourt WHERE offcourt.player_id != [num] 
+	constraintStr[i] += "SELECT game_id, play_id FROM nba_on_court_players offcourt WHERE offcourt.player_id != ";
+	constraintStr[i] += req->getConstraintNum(i); 
+}
+
+void Query::buildStartDate(DBReq * req, int i){
+	// Join games
+	// SELECT game_id FROM nba_games WHERE date >= [game date]
+	constraintStr[i] += "SELECT game_id FROM nba_games WHERE date >= ";
+	constraintStr[i] += req->getConstraintDate(i); 
+}
+
+void Query::buildEndDate(DBReq * req, int i){
+	// Join games
+	// SELECT game_id FROM nba_games WHERE date <= [game date]
+	constraintStr[i] += "SELECT game_id FROM nba_games WHERE date <= ";
+	constraintStr[i] += req->getConstraintDate(i); 
+}
+
+void Query::buildPlayerTeam(DBReq * req, int i){
+	// Want to pull only game/play id's where the player was on a certain team 
+		// so, the player can have done stuff, but on a different team, and that will be excluded
+	// join plays and games, then join that table with filtered on_court_players (to player)
+		// do where on that table for where (player = home_team, home_team_id = passed in id) OR (player != home_team, home_team_id = passed in id)
+	
+	
+	
+	//****************************************************************************************
+	SELECT gp.game_id, gp.play_id FROM (
+		SELECT pl.game_id, pl.play_id, gm.home_team_id FROM plays pl 
+		INNER JOIN (
+			SELECT game_id, home_team_id FROM games
+			) gm 
+		ON pl.game_id = gm.game_id
+	) gp 
+	INNER JOIN (
+		SELECT game_id, play_id, home_team FROM nba_on_court_players WHERE player_id = std::to_string(req->getPID())
+	) plyr
+	ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id AND ((plyr.home_team = true AND (gp.home_team_id = req->getConstraintNum(i))) OR (plyr.home_team = false AND (gp.home_team_id != req->getConstraintNum(i))))
+	//*****************************************************************************************
+	
+}
+
+void Query::buildPlayerOpponent(DBReq * req, int i){
+	// Playing against a certain team 
+		// Just same as above with home_team = true/false flipped?
+	
+	
+	
+	// JOIN games table
+	if (joined[0] == false){
+		joinStrs->push_back("INNER JOIN nba_games g");
+		onStrs->push_back("ON nba_plays.game_id = g.game_id");
 	}
-	if (whereStr != "WHERE"){
-		fullStr += " ";
-		fullStr += whereStr;
+
+	// player home team and away team_id = passed in team_id
+	// OR player away team and home team_id = passed in team_id
+}
+
+void Query::buildNormalPoss(DBReq * req, int i){
+	// normalPoss filters out end of quarter heaves, blowouts, ATO's, and end of game fouling situations
+	// just joining nba_plays with various restrictions
+}
+
+
+
+
+std::string Query::createFullStr(DBReq * req){
+	
+	fullStr = catStr; // Starting cat SELECT
+	std::string catName = "cat";
+	std::string constrtName = "cstrt"
+	
+	// Wrap in cat and add constraint join (**make into its own function?**)
+	for (int i = 0; i < req->getNumConstraints()){
+		// Wrap current query in a select statement whose purpose is really to give the query a table name so that it can be joined 
+		preStr = "SELECT game_id, play_id, event_type FROM (";
+		fullStr = preStr + fullStr;
+		fullStr += ") AS ";
+		fullStr += catName;
+		
+		// Add constraint (join)
+		fullStr += " INNER JOIN (";
+		fullStr += constraintStr[i];
+		fullStr += ") AS ";
+		fullStr += constrtName;
+		fullStr += " ON ";
+		fullStr += catName;
+		fullStr += ".game_id = ";
+		fullStr += constrtName;
+		fullStr += ".game_id AND ";
+		fullStr += catName;
+		fullStr += ".play_id = "
+		fullStr += constrtName;
+		fullStr += ".play_id";
+		
+		// Update cat name, so that it proxies a new table next loop through
+		catName = "cat";
+		catName += i + 1;
+		
+		// Update cnstrnt name, so that it proxies a new table next loop through
+		constrtName = "cstrt";
+		constrtName += i + 1;
 	}
-	if (groupStr != "GROUP BY"){ // Should always be included if I'm always grouping by player?
-		fullStr += " ";
-		fullStr += groupStr;
-	}
+	
+	// Wrap in final SELECT
+	fullStr = "SELECT count(event_type) FROM (" + fullStr + ") AS " + catName; // I think table name at end is required?
+	
 	
 	return fullStr;
 }

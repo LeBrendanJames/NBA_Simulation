@@ -150,17 +150,15 @@ public:
 class Query {
 private:
 	std::string queryStr;
-	std::deque<std::string> * joinStrs; // Can be multiple joins, so store in vector
-	std::deque<std::string> * onStrs; // Can be multiple joins, so store in vector
-	std::string fromStr;
-	std::string whereStr;
-	std::string groupStr;
+	std::string catStr;
+	std::deque<std::string> * constrtStr;
 	
-	void buildQueryFromReq(DBReq *);
+	void buildQueryFromReq(DBReq * req);
 
-	void buildCats(DBReq *);
-	void buildConstrts(DBReq *, bool *);
+	void buildCats(DBReq * req);
+	void buildConstrts(DBReq * req);
 
+	// Each of these returns a subtable for the given player that contains only (game_id, play_id, event_type) that fit their respective category
 	void buildFGA(DBReq *);
 	void buildFGM(DBReq *);
 	void build3PA(DBReq *);
@@ -172,12 +170,23 @@ private:
 	void buildTOV(DBReq *);
 	void buildOffPlays(DBReq *);
 	void buildDefPlays(DBReq *);
+	
+	// Each of these returns a subtable of only (game_id, play_id) that satisfy the constraint
+	void buildPlayerOnCourt(DBReq * req, int i); // 'i' needed so that I can place the resulting string in the constraintStr array
+	void buildPlayerOffCourt(DBReq * req, int i);
+	void buildStartDate(DBReq * req, int i);
+	void buildEndDate(DBReq * req, int i);
+	void buildPlayerTeam(DBReq * req, int i);
+	void buildPlayerOpponent(DBReq * req, int i);
+	void buildNormalPoss(DBReq * req, int i);
 
 public:
 	Query(DBReq *);
 	~Query();
 
-	//std::string getConstraintDate(DBReq *, int); // Already written as a function within DBReq
+	// Takes a category and wraps in a select * to name the subtable 'cat'
+	// Then, (inner) joins a constraint table and wraps everything to call the resulting table cat2
+	// Continues to (inner) join constraint tables in this way for as many as there are to do 
 	std::string createFullStr();
 };
 
