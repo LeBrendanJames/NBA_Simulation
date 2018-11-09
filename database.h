@@ -168,6 +168,7 @@ private:
 	void buildSTL(DBReq * req);
 	void buildBLK(DBReq * req);
 	void buildTOV(DBReq * req);
+	void buildDrawFoul(DBReq * req);
 	void buildOffPlays(DBReq * req);
 	void buildDefPlays(DBReq * req);
 	

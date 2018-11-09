@@ -255,17 +255,8 @@ Query::~Query(){
 
 // HARD-CODED LOGIC FOR HOW STAT CATEGORIES ARE PULLED FROM DB 
 void Query::buildQueryFromReq(DBReq * req){
-	bool joined[15] = {false}; // bool array to mark whether a particular table has been joined into query
-		// 0 = games, 1 = plays, 2 = on_court_players, 3 = players, 4 = teams, 5 = player_team, 
-		// 6 = jump_balls, 7 = shots, 8 = turnovers, 9 = rebounds, 10 = free_throws, 
-		// 11 = fouls, 12 = ejections, 13 = subs, 14 = timeouts, 15 = violations 
-
-	// **need to proxy tables (at least on_court_players, since I can join that multiple times)**
-	// switch over all possible categories
 	buildCats(req); // To start building query based on category and player info from DBReq
-
 	
-	// Loop over constraints, adding to various query strings
 	buildConstrts(req); // Function to build in constraints from DBReq
 } 
 
@@ -354,6 +345,10 @@ void Query::buildTOV(DBReq * req){
 	// Renaming player to event_type is a little bit of a hack to build larger queries where I know I'll just be selecting the count
 	catStr += "SELECT game_id, play_id, player as event_type FROM nba_turnovers WHERE player = ";
 	catStr += std::to_string(req->getPID());
+}
+
+void Query::buildDrawFoul(DBReq * req){
+
 }
 
 void Query::buildOffPlays(DBReq * req){

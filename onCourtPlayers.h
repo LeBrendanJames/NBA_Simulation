@@ -13,7 +13,9 @@ class OnCourtPlayers {
 		Player ** homeLineup;
 		Player ** awayLineup;
 		
-		AdvStats ** homeStats; // To hold current stats for home players (players hold their priors, but actual stats are places in here when calculated)
+		// To hold current stats for home players (players hold their priors, but actual projected stats, 
+		// taking into account everything known at this point, are placed in here when calculated)
+		AdvStats ** homeStats; 
 		AdvStats ** awayStats;
 	
 	public:
@@ -21,7 +23,7 @@ class OnCourtPlayers {
 		~OnCourtPlayers();
 		
 		void calcStats();
-		//void subPlayers(Player * playerOn, Player * playerOff); // Changes pointers in lineup variable and re-calcs all of the lineup stats based on new lineup 
+		// void subPlayers(Player * playerOn, Player * playerOff, bool home); // Changes pointers in lineup array and re-calcs all of the lineup (team & opponent) stats based on new lineup 
 	
 };
 

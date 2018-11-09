@@ -19,8 +19,6 @@ int main() {
 
     // set all the stuff for the player
     playerOne->setPID(196); // 196 = James Harden
-
-    std::cout << "Everything up to calcStats." << std::endl;
     
     // Get player FGA (for now - eventually this will calc everything and place in private variables)
     playerOne->calcPriors();

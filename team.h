@@ -14,6 +14,8 @@ public:
 	Team();
 	~Team();
 	
+	// subPlayers(); // Here?
+	
 };
 
 

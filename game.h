@@ -16,8 +16,8 @@ private:
 	OnCourtPlayers * onCourtPlyrs;
 	// Lineup * homeLineup;
 	// Lineup * awayLineup;
-	Coach * homeCoach; // holds substitution patterns?
-	Coach * awayCoach;
+	// Coach * homeCoach; // holds substitution patterns?
+	// Coach * awayCoach;
 	
 	int homeTeamScore;
 	int awayTeamScore;
@@ -31,17 +31,19 @@ private:
 								 // This will rely on the underlying lineups and eventually coaches + game state + meta-game considerations (home/away, travel, etc.) 
 	
 	void determineInterPossessionChanges(); // Determine if anything happens between possessions (mainly substitutions)
+	// void subPlayers(); // **Should this go here or in team?**
 	
 	void updateTime();
 	
 public:
 	Game();
-	Game(std::string homeTeam, std::string awayTeam)
+	Game(std::string homeTeam, std::string awayTeam);
 	~Game();
 	
 	int simGame(); // Manage game state, calling determinePossOutcome() for each possession
 				   // Returns homeTeamScore - awayTeamScore at end 
 	
 };
+
 
 #endif //SIMULATION_GAME_H
