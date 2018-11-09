@@ -23,7 +23,7 @@ int main() {
     std::cout << "Everything up to calcStats." << std::endl;
     
     // Get player FGA (for now - eventually this will calc everything and place in private variables)
-    playerOne->calcStats();
+    playerOne->calcPriors();
 
     // Print FGA
     std::cout << playerOne->getShootPct() << std::endl;
