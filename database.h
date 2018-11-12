@@ -21,21 +21,18 @@
 class Constraint{
 private:
     std::string constraintType;
-    int constraintNum;
-    struct tm * constraintDate;
+    std::string constraintVal;
+    // int constraintNum;
+    // struct tm * constraintDate;
 
 public:
-	// Constructor/Destructor 
-	Constraint();
+	// Constructor/Destructor
+	Constraint(std::string constraintType, std::string constraintVal);
 	~Constraint();
 	
 	// Getters 
     std::string getConstraintType();
-    int getConstraintNum();
-	void getConstraintDate(struct tm *); // Must pass in a struct tm pointer that will be filled with the information in this constraint
-	
-	// Setters
-	void setConstraint(std::string, int, struct tm *);
+    std::string getConstraintVal();
 };
 
 class DBReq {
@@ -55,6 +52,8 @@ private:
 public:
 	// Constructor/Destructor
 	DBReq();
+	DBReq(int pID, std::string category,
+		  std::vector<std::string> * constraintNames, std::vector<std::string> * constraintVals);
 	~DBReq();
 	
 	// Get size of constraints vector 
@@ -63,15 +62,13 @@ public:
 	// Getters
     int getPID();
     std::string getCategory();
-    void getConstraint(Constraint *, int); // Must pass in a struct tm pointer that will be filled with the information in this constraint
-	std::string getConstraintType(int);
-	int getConstraintNum(int constrNum); // Pass in which constraint, get back constraintNum for that one
-	std::string getConstraintDate(int constrNum); // Pass in which constraint, get back constraintDate for that one (as string, ready for SQL query)
-	
+    std::string getConstraintType(int constraintIndex);
+	std::string getConstraintVal(int constraintIndex);
+
 	// Setters
-	void addPID(int);
-	void addCategory(std::string);
-	void addConstraint(std::string, int, struct tm *);
+	void setPID(int);
+	void setCategory(std::string);
+	void addConstraint(std::string constraintType, std::string constraintVal);
 };
 
 
@@ -98,7 +95,7 @@ public:
 	// Getters 
 	int getResValsSize();
 	int getPID();
-	double getResVal(int);
+	double getResVal(int resValIndex);
 };
 
 class DBRes {
@@ -134,13 +131,12 @@ private:
 
 public:
 	// Connection open upon constructing and close upon deconstruction 
-	DBInterface(); // Use dependency injection?
+	DBInterface(); // **Use dependency injection?
 	~DBInterface();
 	
 	// dbInterface will expose only one function, which takes a DBReq object containing a player ID, 
 	// a category to pull, and a vector of constraint objects
 	bool getDataFromDB(DBReq * req, DBRes * res);
-	
 };
 
 

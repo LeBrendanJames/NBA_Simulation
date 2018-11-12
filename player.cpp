@@ -55,11 +55,15 @@ Player::~Player(){
 
 
 
-int Player::getTotalFromDB(std::string category) {
+int Player::getTotalFromDB(std::string category,
+						   std::vector<std::string> * constraintNames,
+						   std::vector<std::string> * constraintVals) {
     // Create DBReq
-    DBReq * req = new DBReq;
-    req->addPID(this->playerID);
-    req->addCategory(category);
+	// std::vector<std::string> * constraintNames = new std::vector<std::string>;
+	// std::vector<std::string> * constraintVals = new std::vector<std::string>;
+    DBReq * req = new DBReq(this->playerID, category, constraintNames, constraintVals);
+    // req->addPID(this->playerID);
+    // req->addCategory(category);
 	// Additional constraints
 
     // Create DBRes
@@ -100,34 +104,38 @@ int Player::getTotalFromDB(std::string category) {
 // Wrapper function that fills all stat data members of player object
 void Player::calcPriors(){ // Should take a game date?
 
+	std::vector<std::string> * constraintNames = new std::vector<std::string>;
+	std::vector<std::string> * constraintVals = new std::vector<std::string>;
+	// constraintNames->push_back("playerOnCourt");
+	// constraintVals->push_back("462"); // Trevor Ariza = 462, if I'm testing player stuff
+	// constraintNames->push_back("playerOffCourt");
+	// constraintVals->push_back("413"); // Ryan Anderson
+	// constraintNames->push_back("normalPoss");
+	// constraintVals->push_back("0");
+
     //int FGA = getFGAFromDB();
-    int FGA = getTotalFromDB("FGA");
+    int FGA = getTotalFromDB("FGA", constraintNames, constraintVals);
 	if (FGA == -1){
 		// Error handle
 	}
-    int FGM = getTotalFromDB("FGM");
-	int ThreePA = getTotalFromDB("3PA");
-	int ThreePM = getTotalFromDB("3PM");
-	int DREB = getTotalFromDB("DREB");
-	int OREB = getTotalFromDB("OREB");
-	int Steals = getTotalFromDB("Steals");
-	int Blocks = getTotalFromDB("Blocks");
-	int TOV = getTotalFromDB("Turnovers");
+    int FGM = getTotalFromDB("FGM", constraintNames, constraintVals);
+	int ThreePA = getTotalFromDB("3PA", constraintNames, constraintVals);
+	int ThreePM = getTotalFromDB("3PM", constraintNames, constraintVals);
+	int DREB = getTotalFromDB("DREB", constraintNames, constraintVals);
+	int OREB = getTotalFromDB("OREB", constraintNames, constraintVals);
+	int Steals = getTotalFromDB("Steals", constraintNames, constraintVals);
+	int Blocks = getTotalFromDB("Blocks", constraintNames, constraintVals);
+	int TOV = getTotalFromDB("Turnovers", constraintNames, constraintVals);
+	int drawnFouls = getTotalFromDB("DrawnFouls", constraintNames, constraintVals);
 	
-	int offPlays = getTotalFromDB("offPlays");
-	int defPlays = getTotalFromDB("defPlays");
-
-	//std::cout << "FGA = " << FGA << std::endl;
-	//std::cout << "FGM = " << FGM << std::endl;
-
-    // **FOR TESTING. Obviously FGA != shootPct**
-    this->shootPct = FGM / static_cast<double>(FGA);
+	int offPlays = getTotalFromDB("offPlays", constraintNames, constraintVals);
+	int defPlays = getTotalFromDB("defPlays", constraintNames, constraintVals);
 	
 	// Actual stats
 	this->shootPct = FGA / static_cast<double>(offPlays);
 	this->shoot3PtPct = ThreePA / static_cast<double>(offPlays);
 	this->tovPct = TOV / static_cast<double>(offPlays);
-	this->drawFoulPct = TOV / static_cast<double>(offPlays); // **Needs to be fixed**
+	this->drawFoulPct = drawnFouls / static_cast<double>(offPlays); // **Needs to be fixed**
 	this->drebPct = DREB / static_cast<double>(defPlays);
 	this->orebPct = OREB / static_cast<double>(offPlays);
 }

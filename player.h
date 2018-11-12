@@ -40,7 +40,9 @@ private:
 // TODO: Design a 'DBRequest' object that has all the possible request parameters
 
 	// Private functions to get data from DB, for purpose fo filling private variables
-    int getTotalFromDB(std::string);
+    int getTotalFromDB(std::string category,
+					   std::vector<std::string> * constraintNames,
+					   std::vector<std::string> * constraintVals);
 
 
 /*bool getPlayerMins(); // Get total time player was on court

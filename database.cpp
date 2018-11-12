@@ -9,47 +9,38 @@
 
 
 // Constraint constructor  
-Constraint::Constraint(){
-	constraintDate = new struct tm; // Allocate struct tm memory
+Constraint::Constraint(std::string constraintType, std::string constraintVal){
+	this->constraintType = constraintType;
+	this->constraintVal = constraintVal;
 }
 
 // Constraint destructor
-Constraint::~Constraint(){
-	delete constraintDate; // Free memory
-}
+Constraint::~Constraint() = default;
 
 // GET constraintType 
 std::string Constraint::getConstraintType(){
 	return this->constraintType;
 }
 
-// GET constraintNum
-int Constraint::getConstraintNum(){
-	return this->constraintNum;
+// GET constraintVal
+std::string Constraint::getConstraintVal(){
+	return this->constraintVal;
 }
 
-// GET constraintDate 
-void Constraint::getConstraintDate(struct tm * date){
-	date->tm_mday = this->constraintDate->tm_mday; // Day
-    date->tm_mon = this->constraintDate->tm_mon; // Months since January
-    date->tm_year = this->constraintDate->tm_year; // Years since 1900
-	
-	return;
-}
-
-// SET constraint **Does struct tm have a copy constructor? Can I just do constraintDate = this->constraintDate;?**
-void Constraint::setConstraint(std::string constraintType, int constraintNum, struct tm * constraintDate){
-	this->constraintType = constraintType;
-	this->constraintNum = constraintNum;
-	this->constraintDate->tm_mday = constraintDate->tm_mday;
-	this->constraintDate->tm_mon = constraintDate->tm_mon;
-	this->constraintDate->tm_year = constraintDate->tm_year;
-}
 
 
 // DBReq constructor
 DBReq::DBReq(){
 	
+}
+
+DBReq::DBReq(int pID, std::string category,
+             std::vector<std::string> * constraintNames, std::vector<std::string> * constraintVals){
+    this->pID = pID;
+    this->category = category;
+    for (int i = 0; i < constraintNames->size(); i++) {
+        addConstraint((*constraintNames)[i], (*constraintVals)[i]);
+    }
 }
 
 // DBReq destructor 
@@ -72,48 +63,34 @@ std::string DBReq::getCategory(){
 	return category;
 }
 
-// GET Constraint
-void DBReq::getConstraint(Constraint * constraint, int constraintNum){
-	struct tm * tempDate = new struct tm;
-	this->constraints[constraintNum]->getConstraintDate(tempDate); // Set tempDate = constraintDate
-	
-	constraint->setConstraint(this->constraints[constraintNum]->getConstraintType(), this->constraints[constraintNum]->getConstraintNum(), tempDate);
+// GET constraintType
+std::string DBReq::getConstraintType(int constraintIndex){
+    return this->constraints[constraintIndex]->getConstraintType();
 }
 
-std::string DBReq::getConstraintType(int constraintNum){
-    return this->constraints[constraintNum]->getConstraintType();
+// GET constraintVal
+std::string DBReq::getConstraintVal(int constraintIndex){
+	return this->constraints[constraintIndex]->getConstraintVal();
 }
 
-int DBReq::getConstraintNum(int constraintNum){
-    return this->constraints[constraintNum]->getConstraintNum(); // should maybe be getConstraintVal to be clearer???
-}
 
 
 // SET PID 
-void DBReq::addPID(int newPID){
+void DBReq::setPID(int newPID){
 	pID = newPID;
 }
 
 // SET Category 
-void DBReq::addCategory(std::string newCategory) {
+void DBReq::setCategory(std::string newCategory) {
     category = newCategory;
 }
 
 // SET Constraint 
-void DBReq::addConstraint(std::string newConstraintName, int newConstraintNum, struct tm * newConstraintDate){
-	Constraint * newConstraint = new Constraint; // Allocate new constraint
-	newConstraint->setConstraint(newConstraintName, newConstraintNum, newConstraintDate); // Fill constraint 
+void DBReq::addConstraint(std::string newConstraintType, std::string newConstraintVal){
+	Constraint * newConstraint = new Constraint(newConstraintType, newConstraintVal); // Allocate new constraint
 	constraints.push_back(newConstraint); // Add pointer to constraint* vector
 }
 
-std::string DBReq::getConstraintDate(int constraintNum){
-	struct tm * tempDate = new struct tm;
-	this->constraints[constraintNum]->getConstraintDate(tempDate);
-	std::string dateStr = std::to_string(1 + tempDate->tm_mon) + "/" + std::to_string(tempDate->tm_mday) + "/" + std::to_string(1900 + tempDate->tm_year);
-	delete tempDate;
-	
-	return dateStr;
-}
 
 
 
@@ -123,9 +100,7 @@ PlayerRes::PlayerRes(){
 }
 
 // PlayerRes destructor
-PlayerRes::~PlayerRes(){
-	
-}
+PlayerRes::~PlayerRes() = default;
 
 // SET PID 
 void PlayerRes::addPID(int pID){
@@ -148,8 +123,8 @@ int PlayerRes::getPID(){
 }
 
 // GET resVal
-double PlayerRes::getResVal(int valNum){
-	return this->resVals[valNum];
+double PlayerRes::getResVal(int resValIndex){
+	return this->resVals[resValIndex];
 }
 
 // DBRes constructor
@@ -256,14 +231,15 @@ Query::~Query(){
 // HARD-CODED LOGIC FOR HOW STAT CATEGORIES ARE PULLED FROM DB 
 void Query::buildQueryFromReq(DBReq * req){
 	buildCats(req); // To start building query based on category and player info from DBReq
-	
 	buildConstrts(req); // Function to build in constraints from DBReq
 } 
 
 //**In order to get constraints to work, I may need to structure all of the category stuff as a subquery**
 //**Then, constraints can just add on a where clause to the table returned from the subquery (and maybe what to SELECT)**
 void Query::buildCats(DBReq * req){
-	std::string cats[] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB", "Steals", "Blocks", "Turnovers", "offPlays", "defPlays"};
+	std::string cats[] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB",
+						  "Steals", "Blocks", "Turnovers", "DrawnFouls",
+						  "offPlays", "defPlays"};
 
 	if (req->getCategory() == cats[0]){
 		buildFGA(req);
@@ -284,8 +260,10 @@ void Query::buildCats(DBReq * req){
 	} else if (req->getCategory() == cats[8]){
 		buildTOV(req);
 	} else if (req->getCategory() == cats[9]){
-		buildOffPlays(req);
+		buildDrawFoul(req);
 	} else if (req->getCategory() == cats[10]){
+		buildOffPlays(req);
+	} else if (req->getCategory() == cats[11]){
 		buildDefPlays(req);
 	}
 }
@@ -348,7 +326,9 @@ void Query::buildTOV(DBReq * req){
 }
 
 void Query::buildDrawFoul(DBReq * req){
-
+	catStr += "SELECT game_id, play_id, opponent as event_type FROM nba_fouls WHERE opponent = ";
+	catStr += std::to_string(req->getPID());
+	catStr += " AND offensive = false";
 }
 
 void Query::buildOffPlays(DBReq * req){
@@ -409,7 +389,7 @@ void Query::buildOffPlays(DBReq * req){
 }
 
 void Query::buildDefPlays(DBReq * req){
-	//**BASICALLY ONLY CHANGE FROM OFFENSIVE IS TO FLIP g.home_team = true/false it the bottom two full lines of SQL**
+	//BASICALLY ONLY CHANGE FROM OFFENSIVE IS TO FLIP g.home_team = true/false it the bottom two full lines of SQL
 	
 	catStr += "SELECT play.game_id, play.play_id, play.event_type, play.offensive, g.home_team_id, g.away_team FROM (";
 	catStr += "(SELECT COALESCE(p.game_id, f.game_id) as game_id, COALESCE(p.play_id, f.play_id) as play_id, p.team_id, p.event_type, f.offensive FROM ";
@@ -459,6 +439,9 @@ void Query::buildConstrts(DBReq * req){
 	std::string constraints[] = {"playerOnCourt", "playerOffCourt", "startDate", "endDate",
 								 "playerTeam", "playerOpponent", "normalPoss"};
 
+	std::cout << "In buildConstrts." << std::endl;
+	fflush(stdout);
+
 	for (int i = 0; i < req->getNumConstraints(); i++){
 		// Call functions to build subquery strings (just the subquery - joining handled seperately)
 		if (req->getConstraintType(i) == constraints[0]){
@@ -483,16 +466,30 @@ void Query::buildPlayerOnCourt(DBReq * req, int i){
 	// join with nba_on_court_players where PID is on court
 	// SELECT game_id, play_id FROM nba_on_court_players oncourt WHERE oncourt.player_id = [num]
     std::string tempStr = "SELECT game_id, play_id FROM nba_on_court_players oncourt WHERE oncourt.player_id = ";
-    tempStr += std::to_string(req->getConstraintNum(i));
+    tempStr += req->getConstraintVal(i);
 
     constrtStr->push_back(tempStr);
 }
 
 void Query::buildPlayerOffCourt(DBReq * req, int i){
+	// **Want all game_id, play_id that are not in table of all game_id, play_id that player was on court**
+	//**SQL that works
+	/*********************************************************************************
+	select game_id, play_id from nba_on_court_players
+	where player_id = 196 AND
+			(game_id, play_id) NOT IN
+			(select game_id, play_id from nba_on_court_players where player_id = 462)
+	**********************************************************************************/
+	std::string tempStr = "SELECT game_id, play_id FROM nba_on_court_players WHERE player_id = ";
+	tempStr += std::to_string(req->getPID());
+	tempStr += " AND (game_id, play_id) NOT IN (SELECT game_id, play_id FROM nba_on_court_players WHERE player_id = ";
+	tempStr += req->getConstraintVal(i);
+	tempStr += ")";
+
 	// join with nba_on_court_players where PID is not on court
 	// SELECT game_id, play_id FROM nba_on_court_players offcourt WHERE offcourt.player_id != [num] 
-	std::string tempStr = "SELECT game_id, play_id FROM nba_on_court_players offcourt WHERE offcourt.player_id != ";
-	tempStr += std::to_string(req->getConstraintNum(i));
+	// std::string tempStr = "SELECT game_id, play_id FROM nba_on_court_players offcourt WHERE offcourt.player_id != ";
+	// tempStr += req->getConstraintVal(i);
 
     constrtStr->push_back(tempStr);
 }
@@ -500,8 +497,11 @@ void Query::buildPlayerOffCourt(DBReq * req, int i){
 void Query::buildStartDate(DBReq * req, int i){
 	// Join games
 	// SELECT game_id FROM nba_games WHERE date >= [game date]
-	std::string tempStr = "SELECT game_id FROM nba_games WHERE date >= ";
-	tempStr += req->getConstraintDate(i);
+	std::string tempStr = "SELECT nba_games.game_id, nba_plays.play_id FROM nba_games ";
+	tempStr += "INNER JOIN nba_plays ON nba_games.game_id = nba_plays.game_id ";
+	tempStr += "WHERE nba_games.date >= '";
+	tempStr += req->getConstraintVal(i);
+	tempStr += "'";
 
     constrtStr->push_back(tempStr);
 }
@@ -509,8 +509,12 @@ void Query::buildStartDate(DBReq * req, int i){
 void Query::buildEndDate(DBReq * req, int i){
 	// Join games
 	// SELECT game_id FROM nba_games WHERE date <= [game date]
-	std::string tempStr = "SELECT game_id FROM nba_games WHERE date <= ";
-	tempStr += req->getConstraintDate(i);
+	std::string tempStr = "SELECT nba_games.game_id, nba_plays.play_id FROM nba_games ";
+	tempStr += "INNER JOIN nba_plays ON nba_games.game_id = nba_plays.game_id ";
+	tempStr += "WHERE nba_games.date <= '";
+	tempStr += req->getConstraintVal(i);
+	tempStr += "'";
+
 
     constrtStr->push_back(tempStr);
 }
@@ -522,9 +526,9 @@ void Query::buildPlayerTeam(DBReq * req, int i){
 		// do where on that table for where (player = home_team, home_team_id = passed in id) OR (player != home_team, home_team_id = passed in id)
 
 	std::string tempStr = "SELECT gp.game_id, gp.play_id FROM (";
-	tempStr += "SELECT pl.game_id, pl.play_id, gm.home_team_id FROM plays pl ";
+	tempStr += "SELECT pl.game_id, pl.play_id, gm.home_team_id, gm.away_team_id FROM nba_plays pl ";
 	tempStr += "INNER JOIN (";
-	tempStr += "SELECT game_id, home_team_id FROM games";
+	tempStr += "SELECT game_id, home_team as home_team_id, away_team as away_team_id FROM nba_games ";
 	tempStr += ") gm ";
 	tempStr += "ON pl.game_id = gm.game_id";
 	tempStr += ") gp ";
@@ -532,11 +536,11 @@ void Query::buildPlayerTeam(DBReq * req, int i){
 	tempStr += "SELECT game_id, play_id, home_team FROM nba_on_court_players WHERE player_id = ";
 	tempStr += std::to_string(req->getPID());
 	tempStr += ") plyr ";
-	tempStr += "ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id ";
-	tempStr += "AND ((plyr.home_team = true AND (gp.home_team_id = ";
-	tempStr += std::to_string(req->getConstraintNum(i));
-	tempStr += ")) OR (plyr.home_team = false AND (gp.home_team_id != ";
-	tempStr += std::to_string(req->getConstraintNum(i));
+	tempStr += "ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id AND ";
+	tempStr += "((plyr.home_team = true AND (gp.home_team_id = ";
+	tempStr += req->getConstraintVal(i);
+	tempStr += ")) OR (plyr.home_team = false AND (gp.away_team_id = ";
+	tempStr += req->getConstraintVal(i);
 	tempStr += ")))";
 
 	constrtStr->push_back(tempStr);
@@ -544,16 +548,18 @@ void Query::buildPlayerTeam(DBReq * req, int i){
 	/* SQL
 	//****************************************************************************************
 	SELECT gp.game_id, gp.play_id FROM (
-		SELECT pl.game_id, pl.play_id, gm.home_team_id FROM plays pl 
+		SELECT pl.game_id, pl.play_id, gm.home_team_id, gm.away_team_id FROM nba_plays pl
 		INNER JOIN (
-			SELECT game_id, home_team_id FROM games
-			) gm 
+			SELECT game_id, home_team as home_team_id, away_team as away_team_id FROM nba_games
+			) gm
 		ON pl.game_id = gm.game_id
-	) gp 
+	) gp
 	INNER JOIN (
-		SELECT game_id, play_id, home_team FROM nba_on_court_players WHERE player_id = std::to_string(req->getPID())
+		SELECT game_id, play_id, home_team FROM nba_on_court_players WHERE player_id = 196
 	) plyr
-	ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id AND ((plyr.home_team = true AND (gp.home_team_id = req->getConstraintNum(i))) OR (plyr.home_team = false AND (gp.home_team_id != req->getConstraintNum(i))))
+	ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id AND
+	((plyr.home_team = true AND (gp.home_team_id = 11))
+	OR (plyr.home_team = false AND (gp.away_team_id = 11)))
 	//*****************************************************************************************
 	 */
 	
@@ -561,12 +567,12 @@ void Query::buildPlayerTeam(DBReq * req, int i){
 
 void Query::buildPlayerOpponent(DBReq * req, int i){
 	// Playing against a certain team 
-		// Just same as above with home_team = true/false flipped?
+		// Just same as above with home_team_id/away_team_id flipped?
 
 	std::string tempStr = "SELECT gp.game_id, gp.play_id FROM (";
-	tempStr += "SELECT pl.game_id, pl.play_id, gm.home_team_id FROM plays pl ";
+	tempStr += "SELECT pl.game_id, pl.play_id, gm.home_team_id, gm.away_team_id FROM nba_plays pl ";
 	tempStr += "INNER JOIN (";
-	tempStr += "SELECT game_id, home_team_id FROM games";
+	tempStr += "SELECT game_id, home_team as home_team_id, away_team as away_team_id FROM nba_games ";
 	tempStr += ") gm ";
 	tempStr += "ON pl.game_id = gm.game_id";
 	tempStr += ") gp ";
@@ -574,11 +580,11 @@ void Query::buildPlayerOpponent(DBReq * req, int i){
 	tempStr += "SELECT game_id, play_id, home_team FROM nba_on_court_players WHERE player_id = ";
 	tempStr += std::to_string(req->getPID());
 	tempStr += ") plyr ";
-	tempStr += "ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id ";
-	tempStr += "AND ((plyr.home_team = false AND (gp.home_team_id = ";
-	tempStr += std::to_string(req->getConstraintNum(i));
-	tempStr += ")) OR (plyr.home_team = true AND (gp.home_team_id != ";
-	tempStr += std::to_string(req->getConstraintNum(i));
+	tempStr += "ON gp.game_id = plyr.game_id AND gp.play_id = plyr.play_id AND ";
+	tempStr += "((plyr.home_team = true AND (gp.away_team_id = "; //**THIS LINE CHANGED FROM buildPlayerTeam**
+	tempStr += req->getConstraintVal(i);
+	tempStr += ")) OR (plyr.home_team = false AND (gp.home_team_id = "; //**THIS LINE CHANGED FROM buildPlayerTeam**
+	tempStr += req->getConstraintVal(i);
 	tempStr += ")))";
 
 	constrtStr->push_back(tempStr);
@@ -592,8 +598,16 @@ void Query::buildPlayerOpponent(DBReq * req, int i){
 void Query::buildNormalPoss(DBReq * req, int i){
 	// normalPoss filters out end of quarter heaves, blowouts, ATO's, and end of game fouling situations
 	// just joining nba_plays with various restrictions (can be made as simple or complicated as I like)
-	std::string tempStr = "SELECT game_id, play_id FROM nba_plays WHERE ";
-	tempStr += "period < 4 OR remaining_time > 1:00:00";
+	// std::string tempStr = "SELECT game_id, play_id FROM nba_plays WHERE ";
+	// tempStr += "period < 4 OR remaining_time > 60";
+
+	std::string tempStr = "SELECT nba_plays.game_id, nba_plays.play_id FROM nba_plays ";
+	tempStr += "INNER JOIN (";
+	tempStr += "SELECT game_id, play_id FROM nba_on_court_players WHERE player_id = ";
+	tempStr += std::to_string(req->getPID());
+	tempStr += ") ocfilter ";
+	tempStr += "ON nba_plays.game_id = ocfilter.game_id AND nba_plays.play_id = ocfilter.play_id ";
+	tempStr += "WHERE period < 4 OR remaining_time > 60";
 
 	constrtStr->push_back(tempStr);
 }
@@ -602,6 +616,9 @@ void Query::buildNormalPoss(DBReq * req, int i){
 
 
 std::string Query::createFullStr(DBReq * req){
+
+	std::cout << "In createFullStr." << std::endl;
+	fflush(stdout);
 	
 	std::string fullStr = catStr; // Starting cat SELECT
 	std::string catName = "cat";
@@ -610,7 +627,13 @@ std::string Query::createFullStr(DBReq * req){
 	// Wrap in cat and add constraint join (**make into its own function?**)
 	for (int i = 0; i < req->getNumConstraints(); i++){
 		// Wrap current query in a select statement whose purpose is really to give the query a table name so that it can be joined 
-		std::string preStr = "SELECT game_id, play_id, event_type FROM (";
+		std::string preStr = "SELECT ";
+		preStr += catName;
+		preStr += ".game_id, ";
+		preStr += catName;
+		preStr += ".play_id, ";
+		preStr += catName;
+		preStr += ".event_type FROM (";
 		fullStr = preStr + fullStr;
 		fullStr += ") AS ";
 		fullStr += catName;
