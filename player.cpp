@@ -4,14 +4,10 @@
 
 #include "player.h"
 
-
-
 void Player::setDate(struct tm * date, int day, int month, int year){
 	date->tm_mday = day; // Day
 	date->tm_mon = month - 1; // Months since January
 	date->tm_year = year - 1900; // Years since 1900
-
-	return;
 }
 
 
@@ -26,7 +22,6 @@ Player::Player(DBInterface * db){
 	
 	endDate = new struct tm;
 	setDate(endDate, 1, 1, 3000);
-
 }
 
 Player::Player(DBInterface * db, int pID){
@@ -38,6 +33,8 @@ Player::Player(DBInterface * db, int pID){
 	
 	endDate = new struct tm;
 	setDate(endDate, 1, 1, 3000);
+
+	stats = new AdvStats;
 }
 
 Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate){
@@ -45,12 +42,14 @@ Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * end
 	playerID = pID;
 	this->startDate = startDate;
 	this->endDate = endDate;
+
+	stats = new AdvStats;
 	
 	// **Maybe check that the passed in start and end date are valid??**
 }
 
 Player::~Player(){
-
+	delete stats;
 }
 
 
@@ -104,8 +103,8 @@ int Player::getTotalFromDB(std::string category,
 // Wrapper function that fills all stat data members of player object
 void Player::calcPriors(){ // Should take a game date?
 
-	std::vector<std::string> * constraintNames = new std::vector<std::string>;
-	std::vector<std::string> * constraintVals = new std::vector<std::string>;
+	auto * constraintNames = new std::vector<std::string>;
+	auto * constraintVals = new std::vector<std::string>;
 	// constraintNames->push_back("playerOnCourt");
 	// constraintVals->push_back("462"); // Trevor Ariza = 462, if I'm testing player stuff
 	// constraintNames->push_back("playerOffCourt");
@@ -135,7 +134,7 @@ void Player::calcPriors(){ // Should take a game date?
 	this->shootPct = FGA / static_cast<double>(offPlays);
 	this->shoot3PtPct = ThreePA / static_cast<double>(offPlays);
 	this->tovPct = TOV / static_cast<double>(offPlays);
-	this->drawFoulPct = drawnFouls / static_cast<double>(offPlays); // **Needs to be fixed**
+	this->drawFoulPct = drawnFouls / static_cast<double>(offPlays);
 	this->drebPct = DREB / static_cast<double>(defPlays);
 	this->orebPct = OREB / static_cast<double>(offPlays);
 }

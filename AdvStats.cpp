@@ -10,8 +10,8 @@ AdvStats::AdvStats(){
     drebFreq = 0.0;
     orebFreq = 0.0;
 	
-	numOffPlays = 0.0;
-	numDefPlays = 0.0;
+	numOffPlays = static_cast<int>(0.0);
+	numDefPlays = static_cast<int>(0.0);
 }
 
 AdvStats::~AdvStats(){
@@ -144,6 +144,6 @@ int AdvStats::getNumDefPlays(){
 }
 
 
-double AdvStats::calcTotalProb(){
+double AdvStats::calcTotalOffProb(){
 	return shotFreq + shot3PtFreq + tovFreq + drawFoulFreq;
 }

@@ -1,8 +1,6 @@
 #include <iostream>
-#include <libpq-fe.h> //**Not necessary, since already included in database.h?**
-#include "database.h"
+#include "Database/DBInterface.h"
 #include "player.h"
-#include <ctime> //**Not necessary, since already included in player.h?**
 
 /*void do_exit(PGconn *conn) {
     PQfinish(conn);
@@ -12,13 +10,10 @@
 int main() {
 
     // Create DB Class, which opens connection 
-    DBInterface * dbFace = new DBInterface;
+    auto * dbFace = new DBInterface;
 	
     // Create player, passing in DB class
-    Player * playerOne = new Player(dbFace);
-
-    // set all the stuff for the player
-    playerOne->setPID(196); // 196 = James Harden
+    auto * playerOne = new Player(dbFace, 196); // 196 = James Harden
     
     // Get player FGA (for now - eventually this will calc everything and place in private variables)
     playerOne->calcPriors();

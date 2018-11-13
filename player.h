@@ -5,7 +5,8 @@
 #ifndef SIMULATION_PLAYER_H
 #define SIMULATION_PLAYER_H
 
-#include "database.h"
+#include "Database/DBInterface.h"
+#include "AdvStats.h"
 #include <ctime>
 #include <string>
 #include <iostream>
@@ -18,7 +19,9 @@ private:
     struct tm * startDate;
     struct tm * endDate;
 
-    DBInterface * db; // Pointer to DBInterface, which exposes connection and pre-written DB access functions 
+    DBInterface * db; // Pointer to DBInterface, which exposes connection and pre-written DB access functions
+
+	AdvStats * stats;
 
 	// Percentages of how often a player finishes a team play (based on the 5 types of things that can happen - some offensive & some defensive)
 	// **Replace with AdvStats object**
@@ -37,22 +40,11 @@ private:
 // USG Formula: ((FGA + 0.44*FTA + TOV)*(Tm MP * 5)) / (MP *(Tm FGA + 0.44 * Tm FTA + Tm TOV))
 
 // TODO: think through scenarios where a player changes teams. Each function should be able to handle that
-// TODO: Design a 'DBRequest' object that has all the possible request parameters
 
 	// Private functions to get data from DB, for purpose fo filling private variables
     int getTotalFromDB(std::string category,
 					   std::vector<std::string> * constraintNames,
 					   std::vector<std::string> * constraintVals);
-
-
-/*bool getPlayerMins(); // Get total time player was on court
-bool getTeamMins(); // Get total team time (in date range)
-bool getPlayerFGA();
-bool getPlayerFTA(); // TODO: consider whether I want FT attempts or just a count of how often player is fouled or some combo
-bool getPlayerTOV();
-bool getTeamFGA();
-bool getTeamFTA();
-bool getTeamTOV();*/
 	
 public:
 	// Constructors
@@ -69,7 +61,7 @@ public:
     // Getters
     double getShootPct();
     double getTovPct();
-    double getDrawFoulPct();
+    double getDrawFoulPct(); // TODO: consider whether I want FT attempts or just a count of how often player is fouled or some combo
     double getDrebPct();
     double getOrebPct();
 
