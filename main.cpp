@@ -1,12 +1,9 @@
 #include <iostream>
 #include "Database/DBInterface.h"
 #include "player.h"
+#include "game.h"
 
-/*void do_exit(PGconn *conn) {
-    PQfinish(conn);
-    exit(1);
-}*/
-
+/*
 int main() {
 
     // Create DB Class, which opens connection 
@@ -24,87 +21,83 @@ int main() {
     delete playerOne;
     delete dbFace;
 
-    // INPUTS:
-    // Players for each team
-    // Starters for each team
-    // Coach for each team
-    // Referees for each team, eventually
-    // Number of simulations
-
-    // OUTPUTS:
-    // Number of Games won by each team, average score of each team, and average total score
-
-    // Create DB connection
-    // TODO: Abstract away connection string before uploading to Github
-    // TODO: Seems like 'passfile' parameter can be used for this
-    /*PGconn *conn = PQconnectdb("user=postgres dbname=nba_db password=superSecretPassword");
-
-    // Check for connection failure
-    if (PQstatus(conn) == CONNECTION_BAD) {
-        std::cout << "Connection to database failed: " << PQerrorMessage(conn);
-        do_exit(conn);
-    }
-
-    int ver = PQserverVersion(conn);
-    std::cout << "Server version: " << ver << std::endl;
-
-    PGresult * selectResult = PQexec(conn, "SELECT * FROM players WHERE first_name='James'");
-    // TODO: Error checking...
-    int numTuples = PQntuples(selectResult);
-    int numCols = PQnfields(selectResult);
-
-    std::cout << "Query returned " << numTuples << " tuples.";
-    std::cout << " Each tuple has " << numCols << " columns." << std::endl;
-    std::cout << "Results: " << std::endl;
-
-    for (int i = 0; i < numTuples; i++){
-        for (int j = 0; j < numCols; j++){
-            //std::cout << "In printing loop." << std::endl;
-            char * resultString;
-            resultString = PQgetvalue(selectResult, i, j);
-            std::wcout << resultString << " ";
-        }
-        std::cout << std::endl;
-    }
-
-
-    struct tm * startDate = new struct tm;
-    startDate->tm_mday = 10; // Day
-    startDate->tm_mon = 9; // Months since January
-    startDate->tm_year = 114; // Years since 1900
-    struct tm * endDate = new struct tm;
-    startDate->tm_mday = 20; // Day
-    startDate->tm_mon = 3; // Months since January
-    startDate->tm_year = 115; // Years since 1900
-    char * resultString = new char[256];
-    if (getPlayerTotalPoints(conn, resultString, 196, startDate, endDate)){
-        std::cout << "James Harden Points: ";
-        std::wcout << resultString << std::endl;
-    } else {
-        std::cout << "ERROR: Database call returned an error." << std::endl;
-    }
-    delete[] resultString;
-
-    PQfinish(conn);*/
-
-    // Given all needed inputs, I want to be able to estimate probabilities of all possible plays happening
-    // on a given possession
-    // Then, after each possession, I want to be able to estimate the probability of anything
-    // happening before the next possession (which depends on the result of the previous possession)
-    // After, I run another possession, and continue until time runs out
-
-    // ****Need a backtesting suite to know how I should calculate probabilities****
-
-    /*int timeRemaining = 0;
-    for (int i = 1; i <= 4; i++) { // Quarter
-        timeRemaining = 60 * 12;
-        while (timeRemaining > 0) {
-            prePossessionCalcs();
-            findPossessionProbs();
-        }
-    }*/
-
-
-
     return 0;
 }
+*/
+
+int main(){
+	// make DB connection
+	auto * dbFace = new DBInterface;
+	
+	// Take user input to select teams
+		// I'll need to have code to go from team names to current rosters
+	std::string teamA, teamB;
+	std::cout << "What is the first team's code? " << std::endl;
+	std::cin >> teamA;
+	std::cout << "What is the second team's code? " << std::endl;
+	std::cin >> teamB;
+	
+	// Get user input for which team is at home 
+	int homeTeam = 0;
+	std::cout << "Which team will be the home team?" << std::endl;
+	std::cout << "Enter '1' for " << teamA << ", '2' for " << teamB << ", or '0' for neutral: " << std::endl;
+	std::cin >> homeTeam;
+	
+	// Take user input for game date
+	std::stirng gameDate;
+	std::cout << "What date is the game played (MM/DD/YYYY)? " << std::endl;
+	std::cin >> gameDate;
+	
+	// Take user input for number of simulations
+	int numSims = 0;
+	std::cout << "How many simulations would you like to run? " << std::endl;
+	std::cin >> numSims;
+	
+	// Set up score differences vector
+	auto * scoreDifferences = new std::vector<int>;
+	
+	// Run sims 
+	for (int i = 0; i < numSims; i++){
+		// initialize game
+		auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc, homeTeam);
+		
+		// simGame
+		curGm->simGame(); // returns gameState pointer
+		
+		// record results
+		scoreDifferences->push_back(curGm->getHomeScore() - curGm->getAwayScore()); // have vector of score differences
+		
+		// delete game 
+		delete curGm;
+	}
+	
+	// Determine spread
+	// Sort vector
+	sort(scoreDifferences->begin(), scoreDifferences->end());
+	// find middle
+	if (scoreDifferences->size() % 2 != 0){ // odd number of sims
+		double spreadNum = static_cast<double>(scoreDifferences[scoreDifferences->size() / 2]) // integer division by design
+	} else { // even 
+		double spreadNum = (scoreDifferences[scoreDifferences->size() / 2] + scoreDifferences[scoreDifferences->size() / 2 + 1]) / 2.0
+	}
+	
+	// set to string
+	if (spreadNum < 0){
+		std::string spread = std::to_string(spreadNum);
+	} else if (spreadNum > 0){
+		std::string spread = '+' + std::to_string(spreadNum);
+	} else {
+		std::string spread = "pk"; 
+	}
+	
+	// Print spread 
+	std::cout << homeTeamName << " " << spread << std::endl;
+	
+	// delete scoreDifferences vector and database interface object 
+	delete scoreDifferences;
+	delete dbFace;
+	
+	return 0;
+}
+
+

@@ -6,16 +6,18 @@
 #define SIMULATION_TEAM_H
 
 class Team {
-private:
-	Player ** players;
-	Coach * coach;
-	
 public:
 	Team();
 	~Team();
 	
+	// Rotation functions here? These are partially determined by coach and partially by team, so it should fit in team?
+	// Can contain a bunch of stuff around schemes, maybe?
+	
 	// subPlayers(); // Here?
 	
+private:
+	Player ** players;
+	Coach * coach;
 };
 
 

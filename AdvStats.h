@@ -1,5 +1,5 @@
 //
-// Created by Brendan on 6/26/2018.
+// Created by Brendan on 11/10/2018.
 //
 
 #ifndef SIMULATION_ADV_STATS_H
@@ -9,26 +9,13 @@
 	// Will be used by various classes to hold a standard template of stats
 
 class AdvStats {
-private:
-	double shotFreq;
-	double shot3PtFreq;
-    double tovFreq;
-    double drawFoulFreq;
-    double drebFreq;
-    double orebFreq;
-	double stlFreq;
-	double blkFreq;
-	
-	int numOffPlays; // For sample size
-	int numDefPlays; // For sample size
-	
 public:
 	// Constructor/destructor
 	AdvStats();
 	~AdvStats();
 	
-	// Setters (w/ error checking?)
-	bool setShotFreq(double shotFreq);
+	// Setters w/ error checking
+	bool setShotFreq(double shotFreq); // **Could also add 'int possType' here to make setters into an array that holds stat for different possession types
 	bool setShot3PtFreq(double shot3PtFreq);
 	bool setTovFreq(double tovFreq);
 	bool setDrawFoulFreq(double drawFoulFreq);
@@ -36,7 +23,6 @@ public:
 	bool setOrebFreq(double orebFreq);
 	bool setStlFreq(double stlFreq);
 	bool setBlkFreq(double blkFreq);
-	
 	bool setNumOffPlays(int numOffPlays);
 	bool setNumDefPlays(int numDefPlays);
 	
@@ -47,12 +33,24 @@ public:
 	double getDrawFoulFreq();
 	double getDrebFreq();
 	double getOrebFreq();
-	
+	double getStlFreq();
+	double getBlkFreq();
 	int getNumOffPlays();
 	int getNumDefPlays();
 	
 	double calcTotalOffProb();
 	
+private:
+	double shotFreq;
+	double shot3PtFreq;
+    double tovFreq;
+    double drawFoulFreq;
+    double drebFreq;
+    double orebFreq;
+	double stlFreq;
+	double blkFreq;
+	int numOffPlays; // For sample size
+	int numDefPlays; // For sample size
 };
 
 

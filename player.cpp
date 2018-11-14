@@ -4,52 +4,18 @@
 
 #include "player.h"
 
-void Player::setDate(struct tm * date, int day, int month, int year){
-	date->tm_mday = day; // Day
-	date->tm_mon = month - 1; // Months since January
-	date->tm_year = year - 1900; // Years since 1900
-}
 
-
-// Default constructor
-Player::Player(DBInterface * db){
-	this->db = db;
-	
-	playerID = 0;
-	
-	startDate = new struct tm;
-    setDate(startDate, 1, 1, 1970);
-	
-	endDate = new struct tm;
-	setDate(endDate, 1, 1, 3000);
-}
-
+// Constructor
 Player::Player(DBInterface * db, int pID){
 	this->db = db;
 	playerID = pID;
-	
-	startDate = new struct tm;
-    setDate(startDate, 1, 1, 1970);
-	
-	endDate = new struct tm;
-	setDate(endDate, 1, 1, 3000);
 
-	stats = new AdvStats;
+	plyrStats = new AdvStats;
 }
 
-Player::Player(DBInterface * db, int pID, struct tm * startDate, struct tm * endDate){
-	this->db = db;
-	playerID = pID;
-	this->startDate = startDate;
-	this->endDate = endDate;
-
-	stats = new AdvStats;
-	
-	// **Maybe check that the passed in start and end date are valid??**
-}
-
+// Destructor
 Player::~Player(){
-	delete stats;
+	delete plyrStats;
 }
 
 
@@ -130,36 +96,52 @@ void Player::calcPriors(){ // Should take a game date?
 	int offPlays = getTotalFromDB("offPlays", constraintNames, constraintVals);
 	int defPlays = getTotalFromDB("defPlays", constraintNames, constraintVals);
 	
-	// Actual stats
-	this->shootPct = FGA / static_cast<double>(offPlays);
-	this->shoot3PtPct = ThreePA / static_cast<double>(offPlays);
-	this->tovPct = TOV / static_cast<double>(offPlays);
-	this->drawFoulPct = drawnFouls / static_cast<double>(offPlays);
-	this->drebPct = DREB / static_cast<double>(defPlays);
-	this->orebPct = OREB / static_cast<double>(offPlays);
+	// Actual Stats (into AdvStats object)
+	plyrStats->shotFreq = FGA / static_cast<double>(offPlays);
+	plyrStats->shot3PtFreq = ThreePA / static_cast<double>(offPlays);
+	plyrStats->tovFreq = TOV / static_cast<double>(offPlays);
+	plyrStats->drawFoulFreq = drawnFouls / static_cast<double>(offPlays);
+	plyrStats->drebFreq = DREB / static_cast<double>(defPlays);
+	plyrStats->orebFreq = OREB / static_cast<double>(offPlays);
+	plyrStats->sltFreq = Steals / static_cast<double>(defPlays);
+	plyrStats->blkFreq = Blocks / static_cast<double>(defPlays);
+	plyrStats->numOffPlays = offPlays;
+	plyrStats->numDefPlays = defPlays;
 }
 
 
 
 // GETTERS
-double Player::getShootPct(){
-	return shootPct;
+double Player::getShotFreq(){
+	return plyrStats->getShotFreq();
 }
 
-double Player::getTovPct(){
-	return tovPct;
+double Player::getShot3PtFreq(){
+		return plyrStats->getShot3PtFreq();
 }
 
-double Player::getDrawFoulPct(){
-	return drawFoulPct;
+double Player::getTovFreq(){
+	return plyrStats->getTovFreq();
 }
 
-double Player::getDrebPct(){
-	return drebPct;
+double Player::getDrawFoulFreq(){
+	return plyrStats->getDrawFoulFreq();
 }
 
-double Player::getOrebPct(){
-	return orebPct;
+double Player::getDrebFreq(){
+	return plyrStats->getDrebFreq();
+}
+
+double Player::getOrebFreq(){
+	return plyrStats->getOrebFreq();
+}
+
+double Player::getStlFreq(){
+	return plyrStats->getStlFreq();
+}
+
+double Player::getBlkFreq(){
+	return plyrStats->getBlkFreq();
 }
 
 

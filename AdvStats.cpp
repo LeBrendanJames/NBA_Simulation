@@ -9,9 +9,11 @@ AdvStats::AdvStats(){
     drawFoulFreq = 0.0;
     drebFreq = 0.0;
     orebFreq = 0.0;
+	stlFreq = 0.0;
+	blkFreq = 0.0;
 	
-	numOffPlays = static_cast<int>(0.0);
-	numDefPlays = static_cast<int>(0.0);
+	numOffPlays = 0;
+	numDefPlays = 0;
 }
 
 AdvStats::~AdvStats(){
@@ -133,6 +135,14 @@ double AdvStats::getDrebFreq(){
 
 double AdvStats::getOrebFreq(){
 	return orebFreq;
+}
+
+double AdvStats::getStlFreq(){
+	return stlFreq;
+}
+
+double AdvStats::getBlkFreq(){
+	return blkFreq;
 }
 
 int AdvStats::getNumOffPlays(){

@@ -11,23 +11,15 @@ Game::Game(){
 	this->homeLineup = NULL;
 	this->awayLineup = NULL;
 	
-	homeTeamScore = 0;
-	awayTeamScore = 0;
-	quarter = 1;
-	timeRemaining = 12 * 60;
-	
 	srand(time(NULL));
 }
 
-Game::Game(std::string homeTeam, std::string awayTeam, std::string gameDate){
+Game::Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, int gameLoc){
+	this->dbFace = dbFace;
 	this->homeLineup = homeLineup;
 	this->awayLineup = awayLineup;
 	
-	// Set initial game state 
-	homeTeamScore = 0;
-	awayTeamScore = 0;
-	quarter = 1;
-	timeRemaining = 12 * 60;
+	gmState = new GameState(gameDate, gameLoc);
 	
 	srand(time(NULL));
 }
@@ -37,7 +29,7 @@ Game::~Game(){
 }
 
 
-int Game::simGame(){
+void Game::simGame(){
 	// Randomly determine who has possession first
 	int possTeam = rand() % 2;
 	
@@ -63,15 +55,21 @@ int Game::simGame(){
 		}
 	} while (quarter <= 4 || homeTeamScore == awayTeamScore);
 	
-	// Return results up to another object or back out to main?
-	return homeTeamScore - awayTeamScore;
+}
+
+int Game::getHomeScore(){
+	return gmState->getHomeScore();
+}
+
+int Game::getAwayScore(){
+	return gmState->getAwayScore();
 }
 
 
 
 
 // This should be the function that houses all of the logic that i'll build up over time 
-void Game::determinePossOutcome(){
+void Game::determinePossOutcome(){ //**Pass possession type here (ENUM?)**
 	Lineup * offensiveLineup = NULL;
 	if (possTeam == 0){
 		offensiveLineup = homeLineup;
