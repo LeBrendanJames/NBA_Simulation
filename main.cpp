@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include "Database/DBInterface.h"
 #include "player.h"
 #include "game.h"
@@ -42,9 +43,19 @@ int main(){
 	std::cout << "Which team will be the home team?" << std::endl;
 	std::cout << "Enter '1' for " << teamA << ", '2' for " << teamB << ", or '0' for neutral: " << std::endl;
 	std::cin >> homeTeam;
+
+	// Translate 'homeTeam' to an actual teamID
+    std::string gameLoc;
+    if (homeTeam == 1){
+        gameLoc = teamA;
+    } else if (homeTeam == 2){
+        gameLoc = teamB;
+    } else {
+        gameLoc = "NTR"; // Neutral
+    }
 	
 	// Take user input for game date
-	std::stirng gameDate;
+	std::string gameDate;
 	std::cout << "What date is the game played (MM/DD/YYYY)? " << std::endl;
 	std::cin >> gameDate;
 	
@@ -59,7 +70,7 @@ int main(){
 	// Run sims 
 	for (int i = 0; i < numSims; i++){
 		// initialize game
-		auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc, homeTeam);
+		auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc);
 		
 		// simGame
 		curGm->simGame(); // returns gameState pointer
@@ -73,25 +84,28 @@ int main(){
 	
 	// Determine spread
 	// Sort vector
-	sort(scoreDifferences->begin(), scoreDifferences->end());
+	std::sort(scoreDifferences->begin(), scoreDifferences->end());
 	// find middle
+    double spreadNum = 0.0;
 	if (scoreDifferences->size() % 2 != 0){ // odd number of sims
-		double spreadNum = static_cast<double>(scoreDifferences[scoreDifferences->size() / 2]) // integer division by design
+		spreadNum = static_cast<double>((*scoreDifferences)[scoreDifferences->size() / 2]); // integer division by design
 	} else { // even 
-		double spreadNum = (scoreDifferences[scoreDifferences->size() / 2] + scoreDifferences[scoreDifferences->size() / 2 + 1]) / 2.0
+		spreadNum = ((*scoreDifferences)[scoreDifferences->size() / 2] +
+					 (*scoreDifferences)[scoreDifferences->size() / 2 + 1]) / 2.0;
 	}
 	
 	// set to string
+    std::string spread;
 	if (spreadNum < 0){
-		std::string spread = std::to_string(spreadNum);
+		spread = std::to_string(spreadNum);
 	} else if (spreadNum > 0){
-		std::string spread = '+' + std::to_string(spreadNum);
+		spread = '+' + std::to_string(spreadNum);
 	} else {
-		std::string spread = "pk"; 
+		spread = "pk";
 	}
 	
 	// Print spread 
-	std::cout << homeTeamName << " " << spread << std::endl;
+	std::cout << homeTeam << " " << spread << std::endl;
 	
 	// delete scoreDifferences vector and database interface object 
 	delete scoreDifferences;

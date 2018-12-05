@@ -6,7 +6,7 @@ GameState::GameState(std::sting gameDate, int gameLoc){
 	quarter = 1;
 	timeRemaining = 12 * 60;
 	this->gameDate = gameDate;
-	this->gameLoc = gameLoc;
+	this->gameLoc = gameLoc; // getTeamIDFromCode(gameLoc);
 }
 
 GameState::~GameState(){

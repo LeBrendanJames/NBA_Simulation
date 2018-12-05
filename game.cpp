@@ -5,6 +5,8 @@
 #include "game.h"
 #include <stdlib.h>
 #include <time.h>
+#include "team.h"
+#include "onCourtPlayers.h"
 
 
 Game::Game(){
@@ -14,10 +16,13 @@ Game::Game(){
 	srand(time(NULL));
 }
 
-Game::Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, int gameLoc){
+Game::Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, std::string gameLoc){
 	this->dbFace = dbFace;
-	this->homeLineup = homeLineup;
-	this->awayLineup = awayLineup;
+	this->homeTeam = new Team(dbFace, homeTeam, gameDate);
+	this->awayTeam = new Team(dbFace, awayTeam, gameDate);
+	this->onCourtPlyrs = new OnCourtPlayers();
+
+	// convert gameLoc to integer teamID
 	
 	gmState = new GameState(gameDate, gameLoc);
 	
@@ -77,7 +82,7 @@ void Game::determinePossOutcome(){ //**Pass possession type here (ENUM?)**
 		offensiveLineup = awayLineup;
 	}
 	
-	double totalPercentage = 0
+	double totalPercentage = 0;
 	for (int i = 0; i < 5; i++){
 		totalPercentage += offensiveLineup[i]->getShootPct();
 		totalPercentage += offensiveLineup[i]->getTovPct();

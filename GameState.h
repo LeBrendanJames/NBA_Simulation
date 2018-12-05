@@ -28,8 +28,8 @@ private:
 	int awayTeamScore;
 	int quarter;
 	int timeRemaining; // Seconds left in quarter 
-	std::string gameDate
-	int gameLoc
+	std::string gameDate;
+	int gameLoc;
 };
 
 

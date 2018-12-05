@@ -15,7 +15,7 @@ class Game {
 public:
 	Game();
 	Game(std::string homeTeam, std::string awayTeam);
-	Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, int gameLoc)
+	Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, std::string gameLoc);
 	~Game();
 	
 	void simGame(); // Manage game state, calling determinePossOutcome() for each possession
