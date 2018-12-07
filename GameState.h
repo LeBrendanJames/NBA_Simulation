@@ -9,16 +9,20 @@
 
 class GameState {
 public:
-	GameState(std::sting gameDate, int gameLoc);
+	GameState(std::string gameDate, int gameLoc);
 	~GameState();
 	
 	int getHomeScore();
 	int getAwayScore();
+	int getTimeRemaining();
+	int getQuarter();
 
+	void updateScore(int addToScore); // Figures out which team to update based on offensiveTeam variable
 	void updateHomeScore(int addToScore);
 	void updateAwayScore(int addToScore);
 	void updateQuarter();
 	void updateTimeRemaining(int timeToSubtract);
+	void resetTimeRemaining(bool OT);
 	
 	bool isTied();
 	bool is2for1();
@@ -27,7 +31,8 @@ private:
 	int homeTeamScore;
 	int awayTeamScore;
 	int quarter;
-	int timeRemaining; // Seconds left in quarter 
+	int timeRemaining; // Seconds left in quarter
+	int offensiveTeam; // Which team in on offense (1 = home, 0 = away)
 	std::string gameDate;
 	int gameLoc;
 };

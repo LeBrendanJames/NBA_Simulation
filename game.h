@@ -8,6 +8,8 @@
 #include "lineup.h"
 #include "coach.h"
 #include "GameState.h"
+#include "team.h"
+#include "onCourtPlayers.h"
 #include <string>
 
 
@@ -24,7 +26,7 @@ public:
 	int getAwayScore();
 				   
 private:
-	DBInterface * db;
+	DBInterface * dbFace;
 	Team * homeTeam;
 	Team * awayTeam;
 	OnCourtPlayers * onCourtPlyrs;

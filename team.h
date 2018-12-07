@@ -6,12 +6,16 @@
 #define SIMULATION_TEAM_H
 
 #include "database/DBInterface.h"
+#include "lineup.h"
+#include "coach.h"
 
 class Team {
 public:
 	Team();
 	Team(DBInterface * dbFace, std::string teamCode, std::string gameDate);
 	~Team();
+
+	Lineup * getStartingLineup();
 	
 	// Rotation functions here? These are partially determined by coach and partially by team, so it should fit in team?
 	// Can contain a bunch of stuff around schemes, maybe?
@@ -21,6 +25,7 @@ public:
 private:
 	DBInterface * dbFace;
 	Player ** players;
+	Lineup * startingLineup;
 	Coach * coach;
 };
 

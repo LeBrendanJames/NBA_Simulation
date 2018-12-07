@@ -4,27 +4,6 @@
 #include "player.h"
 #include "game.h"
 
-/*
-int main() {
-
-    // Create DB Class, which opens connection 
-    auto * dbFace = new DBInterface;
-	
-    // Create player, passing in DB class
-    auto * playerOne = new Player(dbFace, 196); // 196 = James Harden
-    
-    // Get player FGA (for now - eventually this will calc everything and place in private variables)
-    playerOne->calcPriors();
-
-    // Print FGA
-    std::cout << playerOne->getShootPct() << std::endl;
-
-    delete playerOne;
-    delete dbFace;
-
-    return 0;
-}
-*/
 
 int main(){
 	// make DB connection

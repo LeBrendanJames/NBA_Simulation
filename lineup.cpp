@@ -2,6 +2,8 @@
 // Created by Brendan on 6/26/2018.
 //
 
+#include "lineup.h"
+
 
 Lineup::Lineup(Player * plyr1, Player * plyr2, Player * plyr3, Player * plyr4, Player * plyr5){
 	this->lineup = new Player * [5];
