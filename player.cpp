@@ -97,16 +97,16 @@ void Player::calcPriors(){ // Should take a game date?
 	int defPlays = getTotalFromDB("defPlays", constraintNames, constraintVals);
 	
 	// Actual Stats (into AdvStats object)
-	plyrStats->shotFreq = FGA / static_cast<double>(offPlays);
-	plyrStats->shot3PtFreq = ThreePA / static_cast<double>(offPlays);
-	plyrStats->tovFreq = TOV / static_cast<double>(offPlays);
-	plyrStats->drawFoulFreq = drawnFouls / static_cast<double>(offPlays);
-	plyrStats->drebFreq = DREB / static_cast<double>(defPlays);
-	plyrStats->orebFreq = OREB / static_cast<double>(offPlays);
-	plyrStats->sltFreq = Steals / static_cast<double>(defPlays);
-	plyrStats->blkFreq = Blocks / static_cast<double>(defPlays);
-	plyrStats->numOffPlays = offPlays;
-	plyrStats->numDefPlays = defPlays;
+	plyrStats->setShotFreq(FGA / static_cast<double>(offPlays));
+	plyrStats->setShot3PtFreq(ThreePA / static_cast<double>(offPlays));
+	plyrStats->setTovFreq(TOV / static_cast<double>(offPlays));
+	plyrStats->setDrawFoulFreq(drawnFouls / static_cast<double>(offPlays));
+	plyrStats->setDrebFreq(DREB / static_cast<double>(defPlays));
+	plyrStats->setOrebFreq(OREB / static_cast<double>(offPlays));
+	plyrStats->setStlFreq(Steals / static_cast<double>(defPlays));
+	plyrStats->setBlkFreq(Blocks / static_cast<double>(defPlays));
+	plyrStats->setNumOffPlays(offPlays);
+	plyrStats->setNumDefPlays(defPlays);
 }
 
 
@@ -144,20 +144,16 @@ double Player::getBlkFreq(){
 	return plyrStats->getBlkFreq();
 }
 
+int Player::getNumOffPlays() {
+	return plyrStats->getNumOffPlays();
+}
+
+int Player::getNumDefPlays() {
+	return plyrStats->getNumDefPlays();
+}
+
 
 // SETTERS
 void Player::setPID(int newPID){
     playerID = newPID;
-}
-
-void Player::setTeamID(int teamID){
-	this->teamID = teamID;
-}
-
-void Player::setStartDate(int day, int month, int year){
-	setDate(this->startDate, day, month, year);
-}
-
-void Player::setEndDate(int day, int month, int year){
-	setDate(this->endDate, day, month, year);
 }

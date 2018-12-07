@@ -21,6 +21,10 @@ public:
     // It will make calls to underlying functions
 	// TODO: think through scenarios where a player changes teams. Each function should be able to handle that
 
+	// Setters
+	void setPID(int newPID);
+
+
     // Getters
     double getShotFreq();
 	double getShot3PtFreq();
