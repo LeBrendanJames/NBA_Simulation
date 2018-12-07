@@ -26,6 +26,8 @@ public:
 	// dbInterface will expose only one function, which takes a DBReq object containing a player ID, 
 	// a category to pull, and a vector of constraint objects
 	bool getDataFromDB(DBReq * req, DBRes * res);
+
+	int getTeamIDFromCode(std::string code);
 };
 
 #endif //SIMULATION_DATABASE_H

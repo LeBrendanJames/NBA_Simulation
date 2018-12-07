@@ -61,3 +61,13 @@ void DBInterface::fillRes(DBRes * res, PGresult * slctRes){
 	}
 	std::cout << "exiting fillRes." << std::endl;
 }
+
+int DBInterface::getTeamIDFromCode(std::string code) {
+	if (code == "GSW"){
+		return 10;
+	} else if (code == "MIL"){
+		return 17;
+	} else {
+		return 0;
+	}
+}

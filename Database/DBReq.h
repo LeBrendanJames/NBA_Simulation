@@ -30,7 +30,7 @@ public:
 
 class DBReq {
 private:
-    // Vector of playerID's, so that a req can be sent for multiple players at once
+    // playerID that request is for
     int pID;
 
     // Vector of categories to pull, so that a request for multiple categories can be sent at once
