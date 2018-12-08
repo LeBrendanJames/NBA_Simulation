@@ -231,8 +231,8 @@ void Query::buildConstrts(DBReq * req){
     std::string constraints[] = {"playerOnCourt", "playerOffCourt", "startDate", "endDate",
                                  "playerTeam", "playerOpponent", "normalPoss"};
 
-    std::cout << "In buildConstrts." << std::endl;
-    fflush(stdout);
+    //std::cout << "In buildConstrts." << std::endl;
+    //fflush(stdout);
 
     for (int i = 0; i < req->getNumConstraints(); i++){
         // Call functions to build subquery strings (just the subquery - joining handled seperately)
@@ -409,8 +409,8 @@ void Query::buildNormalPoss(DBReq * req, int i){
 
 std::string Query::createFullStr(DBReq * req){
 
-    std::cout << "In createFullStr." << std::endl;
-    fflush(stdout);
+    //std::cout << "In createFullStr." << std::endl;
+    //fflush(stdout);
 
     std::string fullStr = catStr; // Starting cat SELECT
     std::string catName = "cat";
