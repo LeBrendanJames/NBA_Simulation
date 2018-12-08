@@ -6,17 +6,21 @@
 #define SIMULATION_ON_COURT_PLAYERS_H
 
 #include "lineup.h"
+#include "GameState.h"
 
 
 class OnCourtPlayers {
 public:
 	OnCourtPlayers(Lineup * homeLineup, Lineup * awayLineup);
 	~OnCourtPlayers();
-
-	void changeOffensiveTeam();
 	
 	void calcStats();
 	// void subPlayers(Player * playerOn, Player * playerOff, bool home); // Changes pointers in lineup array and re-calcs all of the lineup (team & opponent) stats based on new lineup 
+
+    double getTotalFrequencies(GameState * gmState);
+    double getTotalShotFreq(GameState * gmState);
+    double getFGPct(GameState * gmState);
+    double getTotalTOVFreq(GameState * gmState);
 
 private:
 	Lineup * homeLineup;
@@ -27,7 +31,8 @@ private:
 	AdvStats ** homeStats; 
 	AdvStats ** awayStats;
 
-	int offLineup; // Which team is on offense (1 = home, 0 = away)
+	void setAdvStats(AdvStats ** stats, Lineup * lineup, int lineupPosition);
+	void setOffTeamPtr(AdvStats *** statsPtr, GameState * gmState);
 };
 
 

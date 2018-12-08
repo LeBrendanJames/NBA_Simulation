@@ -13,9 +13,13 @@ public:
 	// Constructor/destructor
 	AdvStats();
 	~AdvStats();
+
+	// copy constructor
+	AdvStats(const AdvStats &stat);
 	
 	// Setters w/ error checking
-	bool setShotFreq(double shotFreq); // **Could also add 'int possType' here to make setters into an array that holds stat for different possession types
+	bool setShotFreq(double shotFreq); // **Could also add 'int possType' as a parameter here
+										// if variables hold an array of the stat for different situations
 	bool setShot3PtFreq(double shot3PtFreq);
 	bool setTovFreq(double tovFreq);
 	bool setDrawFoulFreq(double drawFoulFreq);
@@ -25,6 +29,8 @@ public:
 	bool setBlkFreq(double blkFreq);
 	bool setNumOffPlays(int numOffPlays);
 	bool setNumDefPlays(int numDefPlays);
+	bool setShotPct(double shotPct);
+	bool setThreePtPct(double threePtPct);
 	
 	// Getters
 	double getShotFreq();
@@ -37,6 +43,8 @@ public:
 	double getBlkFreq();
 	int getNumOffPlays();
 	int getNumDefPlays();
+	double getShotPct();
+	double getThreePtPct();
 	
 	double calcTotalOffProb();
 	
@@ -51,6 +59,9 @@ private:
 	double blkFreq;
 	int numOffPlays; // For sample size
 	int numDefPlays; // For sample size
+
+	double shotPct;
+	double threePtPct;
 };
 
 

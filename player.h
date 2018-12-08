@@ -36,6 +36,8 @@ public:
 	double getBlkFreq();
 	int getNumOffPlays();
 	int getNumDefPlays();
+	double getShotPct();
+	double getThreePtPct();
 	
 private:
 	DBInterface * db; // Pointer to DBInterface, which exposes connection and pre-written DB access functions

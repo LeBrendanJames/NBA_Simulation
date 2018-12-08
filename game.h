@@ -30,13 +30,13 @@ private:
 	Team * homeTeam;
 	Team * awayTeam;
 	OnCourtPlayers * onCourtPlyrs;
-	GameState * gmState; // To hold all the below info about scores/time remaining/etc.
+	GameState * gmState;
 	
 	
 	void determineStatExpectations(); // **Makes use of both lineups and game state? Should be called for each sub but also at predetermined times in game as well?**
 	void determinePossOutcome(); // Function to take in all info and determine the outcome of a possession
 								 // This will rely on the underlying lineups and eventually coaches + game state + meta-game considerations (home/away, travel, etc.) 
-	void determineInterPossessionChanges(); // Determine if anything happens between possessions (mainly substitutions), then call determineStatExpectations to reset stats
+	void determineInterPossChgs(); // Determine if anything happens between possessions (mainly substitutions), then call determineStatExpectations to reset stats
 	// void subPlayers(); // **Should this go here or in team?**
 	void updateTime();
 };

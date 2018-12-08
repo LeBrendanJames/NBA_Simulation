@@ -11,6 +11,7 @@ Player::Player(DBInterface * db, int pID){
 	playerID = pID;
 
 	plyrStats = new AdvStats;
+	calcPriors();
 }
 
 // Destructor
@@ -34,7 +35,7 @@ int Player::getTotalFromDB(std::string category,
     // Create DBRes
     DBRes * res = new DBRes;
 
-    std::cout << "About to get data from DB." << std::endl;
+    //std::cout << "About to get data from DB." << std::endl;
 
     // Call getFGA from DBInterface
     bool dbResult = this->db->getDataFromDB(req, res);
@@ -42,16 +43,16 @@ int Player::getTotalFromDB(std::string category,
 		// Throw error & return -1?
 	}
 
-	std::cout << "About to create temp playerRes." << std::endl;
+	//std::cout << "About to create temp playerRes." << std::endl;
 
     // get Player Res from res object
     PlayerRes * plyrRes = new PlayerRes;
     res->getPlayerRes(plyrRes, 0);
-    std::cout << "through getPlayerRes." << std::endl;
-    std::cout << "resVals size: " << plyrRes->getResValsSize() << std::endl;
+    //std::cout << "through getPlayerRes." << std::endl;
+    //std::cout << "resVals size: " << plyrRes->getResValsSize() << std::endl;
 	int retVal = static_cast<int>(plyrRes->getResVal(0));
 
-	std::cout << "retVal in player.getTotalFromDB: " << retVal << std::endl;
+	//std::cout << "retVal in player.getTotalFromDB: " << retVal << std::endl;
 
 	// Delete plyrRes
 	delete plyrRes;
@@ -107,6 +108,8 @@ void Player::calcPriors(){ // Should take a game date?
 	plyrStats->setBlkFreq(Blocks / static_cast<double>(defPlays));
 	plyrStats->setNumOffPlays(offPlays);
 	plyrStats->setNumDefPlays(defPlays);
+	plyrStats->setShotPct(FGM / static_cast<double>(FGA));
+	plyrStats->setThreePtPct(ThreePM / static_cast<double>(ThreePA));
 }
 
 
@@ -150,6 +153,14 @@ int Player::getNumOffPlays() {
 
 int Player::getNumDefPlays() {
 	return plyrStats->getNumDefPlays();
+}
+
+double Player::getShotPct(){
+	return plyrStats->getShotPct();
+}
+
+double Player::getThreePtPct(){
+	return plyrStats->getThreePtPct();
 }
 
 

@@ -29,6 +29,23 @@ int GameState::getQuarter(){
 	return quarter;
 }
 
+int GameState::getOffensiveTeam(){
+    return offensiveTeam;
+}
+
+bool GameState::setOffensiveTeam(int team){
+    if (team == 0 || team == 1){
+        offensiveTeam = team;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void GameState::changeOffenseTeam(){
+    offensiveTeam = 1 - offensiveTeam;
+}
+
 void GameState::updateScore(int addToScore) {
 	if (offensiveTeam == 1){
 		homeTeamScore += addToScore;
@@ -49,8 +66,13 @@ void GameState::updateAwayScore(int addToScore){
 	}
 }
 
-void GameState::updateQuarter(){
-	quarter++;
+void GameState::moveToNextQuarter(){
+    quarter++;
+    if (quarter <= 4){
+        timeRemaining = 12 * 60;
+    } else {
+        timeRemaining = 5 * 60;
+    }
 }
 
 void GameState::updateTimeRemaining(int timeToSubtract){

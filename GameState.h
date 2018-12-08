@@ -16,13 +16,16 @@ public:
 	int getAwayScore();
 	int getTimeRemaining();
 	int getQuarter();
+	int getOffensiveTeam();
+
+    bool setOffensiveTeam(int team);
+    void changeOffenseTeam();
 
 	void updateScore(int addToScore); // Figures out which team to update based on offensiveTeam variable
 	void updateHomeScore(int addToScore);
 	void updateAwayScore(int addToScore);
-	void updateQuarter();
+	void moveToNextQuarter();
 	void updateTimeRemaining(int timeToSubtract);
-	void resetTimeRemaining(bool OT);
 	
 	bool isTied();
 	bool is2for1();

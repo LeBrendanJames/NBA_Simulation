@@ -50,15 +50,19 @@ int main(){
 	for (int i = 0; i < numSims; i++){
 		// initialize game
 		auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc);
+		std::cout << "From main: Created game." << std::endl;
 		
 		// simGame
 		curGm->simGame(); // returns gameState pointer
+		std::cout << "From main: finished simulation." << std::endl;
 		
 		// record results
 		scoreDifferences->push_back(curGm->getHomeScore() - curGm->getAwayScore()); // have vector of score differences
+		std::cout << "From main: Recorded results." << std::endl;
 		
 		// delete game 
 		delete curGm;
+		std::cout << "From main: Deleted Game." << std::endl;
 	}
 	
 	// Determine spread
@@ -83,8 +87,13 @@ int main(){
 		spread = "pk";
 	}
 	
-	// Print spread 
-	std::cout << homeTeam << " " << spread << std::endl;
+	// Print spread
+	if (homeTeam == 1){
+		std::cout << teamA;
+	} else {
+		std::cout << teamB;
+	}
+	std::cout << " " << spread << std::endl;
 	
 	// delete scoreDifferences vector and database interface object 
 	delete scoreDifferences;

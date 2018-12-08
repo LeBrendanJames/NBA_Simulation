@@ -20,6 +20,22 @@ AdvStats::~AdvStats(){
 	
 }
 
+AdvStats::AdvStats(const AdvStats &stat){
+	shotFreq = stat.shotFreq;
+	shot3PtFreq = stat.shot3PtFreq;
+	tovFreq = stat.tovFreq;
+	drawFoulFreq = stat.drawFoulFreq;
+	drebFreq = stat.drebFreq;
+	orebFreq = stat.orebFreq;
+	stlFreq = stat.stlFreq;
+	blkFreq = stat.blkFreq;
+	numOffPlays = stat.numOffPlays;
+	numDefPlays = stat.numDefPlays;
+
+	shotPct = stat.shotPct;
+	threePtPct = stat.threePtPct;
+}
+
 // Setters (w/ error checking?)
 bool AdvStats::setShotFreq(double shotFreq){
 	if (shotFreq > 0.0 && shotFreq < 1.0){
@@ -111,6 +127,24 @@ bool AdvStats::setBlkFreq(double blkFreq){
 	}
 }
 
+bool AdvStats::setShotPct(double shotPct){
+	if (shotPct > 0.0 && shotPct < 1.0){
+		this->shotPct = shotPct;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool AdvStats::setThreePtPct(double threePtPct){
+	if (threePtPct > 0.0 && threePtPct < 1.0){
+		this->threePtPct = threePtPct;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 
 // Getters
 double AdvStats::getShotFreq(){
@@ -151,6 +185,14 @@ int AdvStats::getNumOffPlays(){
 
 int AdvStats::getNumDefPlays(){
 	return numDefPlays;
+}
+
+double AdvStats::getShotPct(){
+	return shotPct;
+}
+
+double AdvStats::getThreePtPct(){
+	return threePtPct;
 }
 
 
