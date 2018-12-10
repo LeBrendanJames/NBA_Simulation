@@ -1,150 +1,18 @@
-Given 5 players on court, find percentage chance of what's going to happen
-
-                Ignore opponent for now - can be added in later
-
-               
-
-               
-
-How do you do this? Don't worry about code for now - this is more of a statistics question
-
-                Obviously, there are some simple ways to do this (like just adding USG and adjusting proportional so that total = 100% or whatever)
-
-                                This may be a good starting point, just to get something up and working
-
-               
-
-                More complex may include looking at ball-handling duties, and seeing if different players will have different rates of giving up usage based on other players on the floor
-
-                                Some point guards probably jack up the same # of shots regardless of teammates (Russell Westbrook, etc.)
-
-               
-
-                                This could also be done by play type, as some play types (catch-and-shoot, etc.) are dependent of teammate actions
-
-                               
-
-                               
-
-                               
-
-                More and more complexity can be added from this starting point
-
-                                1. Opponents
-
-                                2. Game state
-
-                                                - Which can include all sorts of stuff beyond score/time/home-away, including player time on court, player fouls, etc.
-
-                                3. More advanced analysis of past tendencies
-
-                                                - List here is endless
-
-                                4. Stuff outside the game
-
-                                                - Travel being the most obvious
-
-                                               
-
-                                               
-
-                                               
-
-               
-
-                All of these improvements should only be implemented with backtesting/out-of-sample confirmation
-
-                                Basically, implementing the change should produce more accurate estimates, whether that be point spreads or individual player stats
-
-                                This full backtesting may be difficult to do for a while, so the first couple improvements can stay with theoretical backing even if they don't improve estimates              
-
-                                                A correct change could actually hurt estimates in the beginning if the rest of the model is terrible
-
-                                               
-
-                                **There's two aspects of this (dubbed 'player' and 'coach' in the Hbob ESPN article) that I should be able to backtest**
-
-                                                The 'player' should look at lineup vs lineup. So take a 5-man lineup and simulate it against a bunch of other 5-man lineups and check that the stats look good
-
-                                                The 'coach' aspect should implement rotations as well
-
-                                               
-
-                                               
-
-                                Another option is to run regressions (Find player USG based on a ton of factors, for example), but I wonder if sample sizes are too small or if there is a risk of data-mining here?
-
-                                                Could do for player on possession-by-possession basis?
-
-                                                Then, could look at if the coefficients for each factor are consistent across players, or if they are consistent across a subset of players with something in common (position/age/etc.)
-												
-												
-		
-		
-Questions from a code perspective:
-	When will I need to reach into database?
-		1. When initializing players?
-			Just in a player's constructor, right?
-			call setAdvStats()
-		2. When initializing lineups?
-		-- It will only be one of the above two that are needed, depending on how sophisticated the code gets.
-		-- I can initially start with players then just transfer that code over to lineups when I start handling simulation based on lineups
-		
-		
-So, plan is to move where the database calls come from, depending on how sophisticated the code gets:
-	1. First, it will just be one simple function when a player is initialized
-	2. Next, it will be a call for an entire lineup, and player initialization will consist of almost nothing
-		-- Or, player initialization will still do something and lineup information will make adjustments to that...
-	3. Third, it will incorporate both lineups (team & opponent), so database code will be moved 'up' to an 'onCourtPlayers' object which holds two lineups 
-	4. Fourth, it will incorporate game state, moving code up once again to a 'game' or 'gameState' object
-	5. Fifth, it will incorporate coaches, which will just be an addition to the 'game' or 'gameState' object
-	6. Other additions will come, all of which will be added to the 'game'/'gameState' object 
-	
-Figuring out the totals/stats by lineup will similarly move 'up' levels
-	1. When info is pulled per player, lineup stat breakdowns will be constructed at the 'lineup' object level
-	2. Next, when lineup interaction effects are taken into account, we will just modify the code at the lineup level
-	3. Next, when team and opponent lineups are involved, we will move up a level and determine stats at the 'onCourtPlayers' level
-	4. Finally, it will move up to where everything is done at the 'gameState' level 
-	
-	
-	
-
-	
-	
-	
-Database implementation notes:
-I want to split 'business logic' and underlying database access.
-In this case, database access is read-only, so it's fairly simple in that sense. There are still, however, a large number of different ways I'd like to get data from the database.
-Define 'business logic' as anything that is a calculation pertaining to what is supposed to happen.
-Define 'database interaction' as anything where I would like a simgle number or group of numbers returned.
-
-
-
-
-
-
-
-Layers:
-
-
-Player/Lineup/all other 'business logic' classes
-Class dbInterface (includes opening/closing the database, as well as access procedures that take in a DBReq object)
-Database itself
-
-
-The business logic classes will only make calls to procedures in the dbInterface class 
-Some links on this:
-https://en.wikipedia.org/wiki/Data_access_layer
-https://www.codeproject.com/Articles/445231/The-Data-Access-Layer-Part-The-Basics-And-When-T - The textbook example discussed is basically what I'm going for
-https://softwareengineering.stackexchange.com/questions/257282/organise-c-classes-around-sql-database
-https://softwareengineering.stackexchange.com/questions/197272/best-practice-for-creating-a-global-config-class-used-by-numerous-components
-https://en.wikipedia.org/wiki/Dependency_injection
-https://softwareengineering.stackexchange.com/questions/156481/how-should-i-encapsulate-database-access
-https://stackoverflow.com/questions/15808430/where-should-i-declare-a-database-object
-https://stackoverflow.com/questions/14616751/oop-proper-class-design-for-database-connection-in-derived-child-class
-
-
-Dynamically building queries:
-https://www.codeproject.com/Articles/13419/SelectQueryBuilder-Building-complex-and-flexible-S
- 
-		
+TODO:
+1. BUILD TESTS
+	- Way overdue on this. Terrible software engineering to not have these done.
+2. Move game initialization out of simulation loop
+	- The bottleneck in speed currently is initializing all the players since there's a lot of database calls in that
+	- Those advanced stats don't change during a game simulation so it should only have to be done once
+3. Better estimate player advanced stats
+	- This begins with passing gmState down to the player constructor so that info about the game can be used in estimating stats (game date, H/A, etc.)
+	- Then, this is largely a statistics question of how best to project future performance
+4. Fill database
+	- With previous seasons data
+	- With rosters (how to do this by date, like when a team signs a player mid-season?)
+	- With prev_play data
+5. Simulate game better
+	- Far too simple right now
+	- Update fouling (bonus for 2FT's, etc.)
+	- Update time calcs
+	- Big one is team interaction (subs, etc. - requires working on Team and Coach objects)
