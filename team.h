@@ -8,11 +8,12 @@
 #include "database/DBInterface.h"
 #include "lineup.h"
 #include "coach.h"
+#include "GameState.h"
 
 class Team {
 public:
 	Team();
-	Team(DBInterface * dbFace, std::string teamCode, std::string gameDate);
+	Team(DBInterface * dbFace, std::string teamCode, GameState * gmState);
 	~Team();
 
 	Lineup * getStartingLineup();

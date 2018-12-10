@@ -33,6 +33,10 @@ int GameState::getOffensiveTeam(){
     return offensiveTeam;
 }
 
+std::string GameState::getGameDate() {
+	return gameDate;
+}
+
 bool GameState::setOffensiveTeam(int team){
     if (team == 0 || team == 1){
         offensiveTeam = team;
@@ -50,18 +54,6 @@ void GameState::updateScore(int addToScore) {
 	if (offensiveTeam == 1){
 		homeTeamScore += addToScore;
 	} else {
-		awayTeamScore += addToScore;
-	}
-}
-
-void GameState::updateHomeScore(int addToScore){
-	if (addToScore > 0 && addToScore <= 4){
-		homeTeamScore += addToScore;
-	}
-}
-
-void GameState::updateAwayScore(int addToScore){
-	if (addToScore > 0 && addToScore <= 4){
 		awayTeamScore += addToScore;
 	}
 }

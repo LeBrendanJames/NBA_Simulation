@@ -9,7 +9,7 @@ Team::Team(){
 	
 }
 
-Team::Team(DBInterface * dbFace, std::string teamCode, std::string gameDate){
+Team::Team(DBInterface * dbFace, std::string teamCode, GameState * gmState){
     this->dbFace = dbFace;
 
     // convert team code to teamID and load roster as of game date into players array
@@ -38,7 +38,7 @@ Team::Team(DBInterface * dbFace, std::string teamCode, std::string gameDate){
 
     players = new Player *[15];
     for (int i = 0; i < playerIDs.size(); i++){
-        players[i] = new Player(dbFace, playerIDs[i]);
+        players[i] = new Player(dbFace, playerIDs[i], gmState);
     }
 
     startingLineup = new Lineup(players[0], players[1], players[2], players[3], players[4]);

@@ -6,12 +6,12 @@
 
 
 // Constructor
-Player::Player(DBInterface * db, int pID){
+Player::Player(DBInterface * db, int pID, GameState * gmState){
 	this->db = db;
 	this->playerID = pID;
 
 	plyrStats = new AdvStats;
-	calcPriors();
+	calcPriors(gmState);
 }
 
 // Destructor
@@ -68,16 +68,20 @@ int Player::getTotalFromDB(std::string category,
 
 
 // Wrapper function that fills all stat data members of player object
-void Player::calcPriors(){ // Should take a game date?
+void Player::calcPriors(GameState * gmState){
 
 	auto * constraintNames = new std::vector<std::string>;
 	auto * constraintVals = new std::vector<std::string>;
+
+	constraintNames->push_back("endDate");
+	constraintVals->push_back(gmState->getGameDate());
+
 	// constraintNames->push_back("playerOnCourt");
 	// constraintVals->push_back("462"); // Trevor Ariza = 462, if I'm testing player stuff
 	// constraintNames->push_back("playerOffCourt");
 	// constraintVals->push_back("413"); // Ryan Anderson
-	// constraintNames->push_back("normalPoss");
-	// constraintVals->push_back("0");
+	constraintNames->push_back("normalPoss");
+	constraintVals->push_back("0");
 
     //int FGA = getFGAFromDB();
     int FGA = getTotalFromDB("FGA", constraintNames, constraintVals);

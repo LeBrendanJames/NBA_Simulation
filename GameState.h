@@ -17,13 +17,12 @@ public:
 	int getTimeRemaining();
 	int getQuarter();
 	int getOffensiveTeam();
+	std::string getGameDate();
 
     bool setOffensiveTeam(int team);
     void changeOffenseTeam();
 
 	void updateScore(int addToScore); // Figures out which team to update based on offensiveTeam variable
-	void updateHomeScore(int addToScore);
-	void updateAwayScore(int addToScore);
 	void moveToNextQuarter();
 	void updateTimeRemaining(int timeToSubtract);
 	

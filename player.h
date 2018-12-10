@@ -7,6 +7,7 @@
 
 #include "Database/DBInterface.h"
 #include "AdvStats.h"
+#include "GameState.h"
 #include <ctime>
 #include <string>
 #include <iostream>
@@ -14,10 +15,10 @@
 class Player {
 public:
 	// Constructor/destructor
-	Player(DBInterface * db, int pID);
+	Player(DBInterface * db, int pID, GameState * gmState);
     ~Player();
 
-	void calcPriors(); // this will contain all the 'business logic' of how to calculate advanced stats that I need.
+	void calcPriors(GameState * gmState); // this will contain all the 'business logic' of how to calculate advanced stats that I need.
     // It will make calls to underlying functions
 	// TODO: think through scenarios where a player changes teams. Each function should be able to handle that
 

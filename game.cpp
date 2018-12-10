@@ -18,11 +18,11 @@ Game::Game(){
 
 Game::Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std::string gameDate, std::string gameLoc){
 	this->dbFace = dbFace;
-	this->homeTeam = new Team(dbFace, homeTeam, gameDate);
-	this->awayTeam = new Team(dbFace, awayTeam, gameDate);
-	this->onCourtPlyrs = new OnCourtPlayers(this->homeTeam->getStartingLineup(), this->awayTeam->getStartingLineup());
-	
+
 	gmState = new GameState(gameDate, dbFace->getTeamIDFromCode(gameLoc));
+	this->homeTeam = new Team(dbFace, homeTeam, gmState);
+	this->awayTeam = new Team(dbFace, awayTeam, gmState);
+	this->onCourtPlyrs = new OnCourtPlayers(this->homeTeam->getStartingLineup(), this->awayTeam->getStartingLineup());
 	
 	srand(time(NULL));
 }
