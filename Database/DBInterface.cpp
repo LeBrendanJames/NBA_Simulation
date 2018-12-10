@@ -3,6 +3,7 @@
 //
 
 #include "DBInterface.h"
+#include "dbcon.h"
 #include <ctime>
 #include <string>
 #include <iostream>
@@ -10,7 +11,13 @@
 
 // Default constructor
 DBInterface::DBInterface(){
-	conn = PQconnectdb("user=postgres dbname=nba_db password=Bcj--403");
+	std::string conninfo = "user=";
+	conninfo += getUser();
+	conninfo += " dbname=";
+	conninfo += getDBName();
+	conninfo += " password=";
+	conninfo += getPW();
+	conn = PQconnectdb(conninfo.c_str());
 }
 
 // Destructor
