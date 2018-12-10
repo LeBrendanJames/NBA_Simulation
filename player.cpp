@@ -8,7 +8,7 @@
 // Constructor
 Player::Player(DBInterface * db, int pID){
 	this->db = db;
-	playerID = pID;
+	this->playerID = pID;
 
 	plyrStats = new AdvStats;
 	calcPriors();
@@ -93,7 +93,6 @@ void Player::calcPriors(){ // Should take a game date?
 	int Blocks = getTotalFromDB("Blocks", constraintNames, constraintVals);
 	int TOV = getTotalFromDB("Turnovers", constraintNames, constraintVals);
 	int drawnFouls = getTotalFromDB("DrawnFouls", constraintNames, constraintVals);
-	
 	int offPlays = getTotalFromDB("offPlays", constraintNames, constraintVals);
 	int defPlays = getTotalFromDB("defPlays", constraintNames, constraintVals);
 	

@@ -28,7 +28,10 @@ Game::Game(DBInterface * dbFace, std::string homeTeam, std::string awayTeam, std
 }
 
 Game::~Game(){
-	
+	delete homeTeam;
+	delete awayTeam;
+	delete onCourtPlyrs;
+	delete gmState;
 }
 
 

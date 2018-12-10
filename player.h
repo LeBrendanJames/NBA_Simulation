@@ -24,7 +24,6 @@ public:
 	// Setters
 	void setPID(int newPID);
 
-
     // Getters
     double getShotFreq();
 	double getShot3PtFreq();

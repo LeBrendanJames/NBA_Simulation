@@ -11,13 +11,10 @@ AdvStats::AdvStats(){
     orebFreq = 0.0;
 	stlFreq = 0.0;
 	blkFreq = 0.0;
-	
 	numOffPlays = 0;
 	numDefPlays = 0;
-}
-
-AdvStats::~AdvStats(){
-	
+	shotPct = 0.0;
+	threePtPct = 0.0;
 }
 
 AdvStats::AdvStats(const AdvStats &stat){
@@ -36,7 +33,7 @@ AdvStats::AdvStats(const AdvStats &stat){
 	threePtPct = stat.threePtPct;
 }
 
-// Setters (w/ error checking?)
+// Setters
 bool AdvStats::setShotFreq(double shotFreq){
 	if (shotFreq > 0.0 && shotFreq < 1.0){
 		this->shotFreq = shotFreq;

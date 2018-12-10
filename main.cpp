@@ -54,9 +54,11 @@ int main(){
 		
 		// simGame
 		curGm->simGame(); // returns gameState pointer
-		std::cout << "From main: finished simulation." << std::endl;
+		std::cout << "From main: Finished simulation." << std::endl;
 		
 		// record results
+		std::cout << "Sim complete. Score (home - away): ";
+		std::cout << curGm->getHomeScore() - curGm->getAwayScore() << std::endl;
 		scoreDifferences->push_back(curGm->getHomeScore() - curGm->getAwayScore()); // have vector of score differences
 		std::cout << "From main: Recorded results." << std::endl;
 		
@@ -72,10 +74,22 @@ int main(){
     double spreadNum = 0.0;
 	if (scoreDifferences->size() % 2 != 0){ // odd number of sims
 		spreadNum = static_cast<double>((*scoreDifferences)[scoreDifferences->size() / 2]); // integer division by design
+		std::cout << scoreDifferences->size() << std::endl;
+		std::cout << (*scoreDifferences)[scoreDifferences->size() / 2] << std::endl;
 	} else { // even 
-		spreadNum = ((*scoreDifferences)[scoreDifferences->size() / 2] +
-					 (*scoreDifferences)[scoreDifferences->size() / 2 + 1]) / 2.0;
+		spreadNum = ((*scoreDifferences)[scoreDifferences->size() / 2 - 1] +
+					 (*scoreDifferences)[scoreDifferences->size() / 2]) / 2.0;
+		//std::cout << scoreDifferences->size() << std::endl;
+		//std::cout << (*scoreDifferences)[scoreDifferences->size() / 2] << std::endl;
+		//std::cout << (*scoreDifferences)[scoreDifferences->size() / 2 + 1];
+		std::cout << "spreadNum: " << spreadNum << std::endl;
 	}
+
+	std::cout << "Score differences: ";
+	for (int i = 0; i < scoreDifferences->size(); i++){
+	    std::cout << (*scoreDifferences)[i] << ",";
+	}
+	std::cout << std::endl;
 	
 	// set to string
     std::string spread;

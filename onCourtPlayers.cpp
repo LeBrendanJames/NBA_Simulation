@@ -15,7 +15,6 @@ OnCourtPlayers::OnCourtPlayers(Lineup * homeLineup, Lineup * awayLineup){
 	    awayStats[i] = new AdvStats;
 	}
 
-	// TODO: Pull up player stats into the AdvStats objects held within OnCourtPlayers
     calcStats();
 }
 

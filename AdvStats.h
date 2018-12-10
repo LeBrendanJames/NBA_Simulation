@@ -12,7 +12,7 @@ class AdvStats {
 public:
 	// Constructor/destructor
 	AdvStats();
-	~AdvStats();
+	~AdvStats() = default;
 
 	// copy constructor
 	AdvStats(const AdvStats &stat);
@@ -59,7 +59,6 @@ private:
 	double blkFreq;
 	int numOffPlays; // For sample size
 	int numDefPlays; // For sample size
-
 	double shotPct;
 	double threePtPct;
 };
