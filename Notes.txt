@@ -4,9 +4,11 @@ TODO:
 2. Move game initialization out of simulation loop
 	- The bottleneck in speed currently is initializing all the players since there's a lot of database calls in that
 	- Those advanced stats don't change during a game simulation so it should only have to be done once
+	- One way to do this would be to create a Game object then within the loop copy all the info over to a new game object 
+	which is used for the simulation then deleted
+		- This would require writing all the copy constructors
 3. Better estimate player advanced stats
-	- This begins with passing gmState down to the player constructor so that info about the game can be used in estimating stats (game date, H/A, etc.)
-	- Then, this is largely a statistics question of how best to project future performance
+	- This is largely a statistics question of how best to project future performance rather than a programming issue
 4. Fill database
 	- With previous seasons data
 	- With rosters (how to do this by date, like when a team signs a player mid-season?)
