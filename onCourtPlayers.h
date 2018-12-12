@@ -12,6 +12,7 @@
 class OnCourtPlayers {
 public:
 	OnCourtPlayers(Lineup * homeLineup, Lineup * awayLineup);
+	OnCourtPlayers(const OnCourtPlayers &onCourtPlyrs);
 	~OnCourtPlayers();
 	
 	void calcStats();

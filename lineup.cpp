@@ -21,6 +21,20 @@ Lineup::Lineup(Player * plyr1, Player * plyr2, Player * plyr3, Player * plyr4, P
 	calcLineupStats();
 }
 
+Lineup::Lineup(const Lineup &lineup){
+	// Set up player pointers (setting to NULL)
+	this->lineup = new Player *[5];
+	for (int i = 0; i < 5; i++){
+		this->lineup[i] = NULL;
+	}
+
+	// Copy over stats
+	this->stats = new AdvStats *[5];
+	for (int i = 0; i < 5; i++){
+		stats[i] = new AdvStats(*lineup.stats[i]);
+	}
+}
+
 Lineup::~Lineup(){
 	delete [] this->lineup;
 
@@ -98,4 +112,12 @@ double Lineup::getShotPct(int lineupPosition){
 
 double Lineup::getThreePtPct(int lineupPosition){
 	return lineup[lineupPosition]->getThreePtPct();
+}
+
+void Lineup::setNewPlayers(Player * plyr0, Player * plyr1, Player * plyr2, Player * plyr3, Player * plyr4) {
+	this->lineup[0] = plyr0;
+	this->lineup[1] = plyr1;
+	this->lineup[2] = plyr2;
+	this->lineup[3] = plyr3;
+	this->lineup[4] = plyr4;
 }

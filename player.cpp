@@ -14,6 +14,13 @@ Player::Player(DBInterface * db, int pID, GameState * gmState){
 	calcPriors(gmState);
 }
 
+Player::Player(const Player &player){
+	this->db = player.db;
+	this->playerID = player.playerID;
+
+	this->plyrStats = new AdvStats(*player.plyrStats);
+}
+
 // Destructor
 Player::~Player(){
 	delete plyrStats;

@@ -16,6 +16,7 @@ class Player {
 public:
 	// Constructor/destructor
 	Player(DBInterface * db, int pID, GameState * gmState);
+	Player(const Player &player);
     ~Player();
 
 	void calcPriors(GameState * gmState); // this will contain all the 'business logic' of how to calculate advanced stats that I need.

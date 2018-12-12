@@ -45,9 +45,26 @@ Team::Team(DBInterface * dbFace, std::string teamCode, GameState * gmState){
 
 }
 
+Team::Team(const Team &team){
+    this->dbFace = team.dbFace;
+
+    players = new Player *[15];
+    for (int i = 0; i < 15; i++){
+        players[i] = new Player(*team.players[i]);
+    }
+
+    startingLineup = new Lineup(*team.startingLineup);
+
+    // Change pointers (since lineup copy constructor still has them pointing to old lineup's players)
+    startingLineup->setNewPlayers(players[0],players[1],players[2],players[3],players[4]);
+}
+
 Team::~Team(){
 	// Delete allocated players & pointer array
-
+    for (int i = 0; i < 15; i++){
+        delete players[i];
+    }
+    delete players;
 }
 
 

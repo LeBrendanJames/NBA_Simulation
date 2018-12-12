@@ -34,6 +34,16 @@ Game::~Game(){
 	delete gmState;
 }
 
+Game::Game(const Game &game){
+	std::cout << "Invoking game copy constructor." << std::endl;
+
+	this->dbFace = game.dbFace;
+    this->gmState = new GameState(*game.gmState);
+    this->homeTeam = new Team(*game.homeTeam);
+    this->awayTeam = new Team(*game.awayTeam);
+    this->onCourtPlyrs = new OnCourtPlayers(*game.onCourtPlyrs);
+}
+
 
 void Game::simGame(){
 	// Randomly determine who has possession first
@@ -41,8 +51,15 @@ void Game::simGame(){
 	gmState->setOffensiveTeam(rand() % 2);
 	
 	do {
+		//std::cout << "starting game quarter loop." << std::endl;
+
 		// Loop for quarter
+		//int j = 0;
 		while (gmState->getTimeRemaining() > 0){
+			//j++;
+			//std::cout << "Within possession loop time #" << j;
+			//std::cout << ", Time remaining = " << gmState->getTimeRemaining() << std::endl;
+
 			// Determine what happens
 			determinePossOutcome();
 			
@@ -77,6 +94,8 @@ void Game::determinePossOutcome(){ //**Pass possession type here (ENUM?)**
 	double totalPct = onCourtPlyrs->getTotalFrequencies(gmState) * 100; // Easier to work with percentage as full number
 	
 	int action = rand() % static_cast<int>(totalPct) + 1; // Determine action
+	//std::cout << "totalPct = " << totalPct << std::endl;
+	//std::cout << "Action = " << action << std::endl;
 
 	// Figure out what action was and who did it. Do stuff based on that.
 	totalPct = 0;

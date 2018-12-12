@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include <iostream>
 
 GameState::GameState(std::string gameDate, int gameLoc){
 	homeTeamScore = 0;
@@ -11,6 +12,15 @@ GameState::GameState(std::string gameDate, int gameLoc){
 
 GameState::~GameState(){
 	
+}
+
+GameState::GameState(const GameState &gameState){
+	this->homeTeamScore = gameState.homeTeamScore;
+	this->awayTeamScore = gameState.awayTeamScore;
+	this->quarter = gameState.quarter;
+	this->timeRemaining = gameState.timeRemaining;
+	this->gameDate = gameState.gameDate;
+	this->gameLoc = gameState.gameLoc;
 }
 
 int GameState::getHomeScore(){
@@ -40,8 +50,10 @@ std::string GameState::getGameDate() {
 bool GameState::setOffensiveTeam(int team){
     if (team == 0 || team == 1){
         offensiveTeam = team;
+        std::cout << "Offensive team set to " << team << std::endl;
         return true;
     } else {
+    	std::cout << "Offensive team not set." << std::endl;
         return false;
     }
 }
@@ -68,7 +80,7 @@ void GameState::moveToNextQuarter(){
 }
 
 void GameState::updateTimeRemaining(int timeToSubtract){
-	if (timeToSubtract >0 && timeToSubtract <= timeRemaining){
+	if (timeToSubtract > 0) { //&& timeToSubtract <= timeRemaining){
 		timeRemaining -= timeToSubtract;
 	}
 }

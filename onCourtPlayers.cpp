@@ -18,6 +18,21 @@ OnCourtPlayers::OnCourtPlayers(Lineup * homeLineup, Lineup * awayLineup){
     calcStats();
 }
 
+OnCourtPlayers::OnCourtPlayers(const OnCourtPlayers &onCourtPlyrs) {
+    this->homeLineup = onCourtPlyrs.homeLineup;
+    this->awayLineup = onCourtPlyrs.awayLineup;
+
+    homeStats = new AdvStats *[5];
+    for (int i = 0; i < 5; i++){
+        homeStats[i] = new AdvStats(*onCourtPlyrs.homeStats[i]);
+    }
+
+    awayStats = new AdvStats *[5];
+    for (int i = 0; i < 5; i++){
+        awayStats[i] = new AdvStats(*onCourtPlyrs.awayStats[i]);
+    }
+}
+
 OnCourtPlayers::~OnCourtPlayers(){
 	for (int i = 0; i < 5; i++){
 	    delete homeStats[i];

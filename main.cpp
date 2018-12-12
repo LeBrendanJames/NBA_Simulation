@@ -45,12 +45,23 @@ int main(){
 	
 	// Set up score differences vector
 	auto * scoreDifferences = new std::vector<int>;
+
+	// Initialize game
+    auto * gameTemplate = new Game(dbFace, teamA, teamB, gameDate, gameLoc);
+    std::cout << "From main: Created game." << std::endl;
 	
 	// Run sims 
 	for (int i = 0; i < numSims; i++){
 		// initialize game
-		auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc);
-		std::cout << "From main: Created game." << std::endl;
+		//auto * curGm = new Game(dbFace, teamA, teamB, gameDate, gameLoc);
+		//std::cout << "From main: Created game." << std::endl;
+
+        // Copy game
+        auto * curGm = new Game(*gameTemplate);
+        std::cout << "From main: Copied Game." << std::endl;
+
+        //**JUST FOR TESTING**
+        //delete gameTemplate;
 		
 		// simGame
 		curGm->simGame(); // returns gameState pointer
@@ -59,6 +70,8 @@ int main(){
 		// record results
 		std::cout << "Sim complete. Score (home - away): ";
 		std::cout << curGm->getHomeScore() - curGm->getAwayScore() << std::endl;
+		std::cout << "Home score: " << curGm->getHomeScore() << std::endl;
+		std::cout << "Away score: " << curGm->getAwayScore() << std::endl;
 		scoreDifferences->push_back(curGm->getHomeScore() - curGm->getAwayScore()); // have vector of score differences
 		std::cout << "From main: Recorded results." << std::endl;
 		

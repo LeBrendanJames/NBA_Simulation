@@ -14,6 +14,7 @@ class Team {
 public:
 	Team();
 	Team(DBInterface * dbFace, std::string teamCode, GameState * gmState);
+	Team(const Team &team);
 	~Team();
 
 	Lineup * getStartingLineup();

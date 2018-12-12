@@ -10,14 +10,9 @@
 // this one should contain a bunch of the methods to figure out what happens based on who is on the floor?
 
 class Lineup {
-private:
-	Player ** lineup;
-	AdvStats ** stats; // to hold each players expected stats in this lineup
-
-	void calcLineupStats();
-	
 public:
 	Lineup(Player *, Player *, Player *, Player *, Player *);
+	Lineup(const Lineup &lineup);
 	~Lineup();
 
 	// Getters
@@ -34,10 +29,18 @@ public:
 
 	double getShotPct(int lineupPosition);
 	double getThreePtPct(int lineupPosition);
+
+	void setNewPlayers(Player*, Player*, Player*, Player*, Player*);
 		
 	//void calcLineupStats(Lineup * oppLineup); // Calc stats, which get placed in each individual players stat categories
 	//void subPlayers(Player * playerOn, Player * playerOff); // Changes pointers in lineup variable and re-calcs all of the lineup stats based on new lineup
-	
+
+
+private:
+	Player ** lineup;
+	AdvStats ** stats; // to hold each players expected stats in this lineup
+
+	void calcLineupStats();
 };
 
 

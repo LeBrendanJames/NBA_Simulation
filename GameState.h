@@ -11,6 +11,7 @@ class GameState {
 public:
 	GameState(std::string gameDate, int gameLoc);
 	~GameState();
+	GameState(const GameState &gameState);
 	
 	int getHomeScore();
 	int getAwayScore();
