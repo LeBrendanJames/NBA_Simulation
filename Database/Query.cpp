@@ -303,7 +303,7 @@ void Query::buildEndDate(DBReq * req, int i){
     // SELECT game_id FROM nba_games WHERE date <= [game date]
     std::string tempStr = "SELECT nba_games.game_id, nba_plays.play_id FROM nba_games ";
     tempStr += "INNER JOIN nba_plays ON nba_games.game_id = nba_plays.game_id ";
-    tempStr += "WHERE nba_games.date <= '";
+    tempStr += "WHERE nba_games.date < '";
     tempStr += req->getConstraintVal(i);
     tempStr += "'";
 
