@@ -2,6 +2,8 @@ TODO:
 1. BUILD TESTS
 	- Way overdue on this. Terrible software engineering to not have these done.
 	- Better documentation too
+	- Step 1 is to build test database that gets loaded with information then never edited
+		- All tests interact with this so that the expected outputs are known
 2. Better estimate player advanced stats
 	- This is largely a statistics question of how best to project future performance rather than a programming issue
 	- At player level, need to take into account who past possessions have been played with
@@ -10,7 +12,6 @@ TODO:
 3. Fill database
 	- With previous seasons data
 	- With rosters (how to do this by date, like when a team signs a player mid-season?)
-	- With prev_play data
 4. Simulate game better
 	- Far too simple right now
 	- Update fouling (bonus for 2FT's, etc.)
