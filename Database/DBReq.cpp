@@ -35,8 +35,10 @@ DBReq::DBReq(int pID, std::string category,
              std::vector<std::string> * constraintNames, std::vector<std::string> * constraintVals){
     this->pID = pID;
     this->category = category;
-    for (int i = 0; i < constraintNames->size(); i++) {
-        addConstraint((*constraintNames)[i], (*constraintVals)[i]);
+    if (constraintNames != nullptr) {
+        for (int i = 0; i < constraintNames->size(); i++) {
+            addConstraint((*constraintNames)[i], (*constraintVals)[i]);
+        }
     }
 }
 
