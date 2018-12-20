@@ -20,6 +20,16 @@ DBInterface::DBInterface(){
 	conn = PQconnectdb(conninfo.c_str());
 }
 
+DBInterface::DBInterface(std::string user, std::string dbname, std::string pw) {
+	std::string conninfo = "user=";
+	conninfo += user;
+	conninfo += " dbname=";
+	conninfo += dbname;
+	conninfo += " password=";
+	conninfo += pw;
+	conn = PQconnectdb(conninfo.c_str());
+}
+
 // Destructor
 DBInterface::~DBInterface() {
 	PQfinish(conn);

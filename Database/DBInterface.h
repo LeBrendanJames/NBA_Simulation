@@ -21,6 +21,7 @@ private:
 public:
 	// Connection open upon constructing and close upon deconstruction 
 	DBInterface(); // **Use dependency injection?
+	DBInterface(std::string user, std::string dbname, std::string pw);
 	~DBInterface();
 	
 	// dbInterface will expose only one function, which takes a DBReq object containing a player ID, 
