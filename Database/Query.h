@@ -13,19 +13,36 @@
 
 
 class Query {
+public:
+    Query(DBReq *);
+    ~Query();
+
+    // Takes a category and wraps in a select * to name the subtable 'cat'
+    // Then, (inner) joins a constraint table and wraps everything to call the resulting table cat2
+    // Continues to (inner) join constraint tables in this way for as many as there are to do
+    std::string createFullStr(DBReq * req);
+
 private:
-    std::string queryStr;
+    //std::string queryStr;
     std::string catStr;
     std::deque<std::string> * constrtStr;
 
-    void buildQueryFromReq(DBReq * req);
+    // Only called from constructor
+    // Calls buildCats & buildConstrts, below
+    void buildQueryFromReq(DBReq * req); 
 
-    void buildCats(DBReq * req);
-    void buildConstrts(DBReq * req);
+    void buildCats(DBReq * req); // Build up SQL query based on what statistic is requested in DBReq, places in catStr
+    void buildConstrts(DBReq * req); // Wrap subquery from buildCats in various constraints, 
+                                     // places constraints in constrtStr 
+                                     // (generally implemented by joining subtable returned from 
+                                     // buildCats with a subtable of suitable game_id/play_id combos) 
 
-    // Each of these returns a subtable for the given player that contains only (game_id, play_id, event_type) that fit their respective category
+    // Each of these returns a subtable for the given player that 
+    // contains only (game_id, play_id, event_type) that fit their respective category
     void buildFGA(DBReq * req);
     void buildFGM(DBReq * req);
+    void build2PA(DBReq * req);
+    void build2PM(DBReq * req);
     void build3PA(DBReq * req);
     void build3PM(DBReq * req);
     void buildDREB(DBReq * req);
@@ -45,15 +62,6 @@ private:
     void buildPlayerTeam(DBReq * req, int i);
     void buildPlayerOpponent(DBReq * req, int i);
     void buildNormalPoss(DBReq * req, int i);
-
-public:
-    Query(DBReq *);
-    ~Query();
-
-    // Takes a category and wraps in a select * to name the subtable 'cat'
-    // Then, (inner) joins a constraint table and wraps everything to call the resulting table cat2
-    // Continues to (inner) join constraint tables in this way for as many as there are to do
-    std::string createFullStr(DBReq * req);
 };
 
 #endif //SIMULATION_QUERY_H

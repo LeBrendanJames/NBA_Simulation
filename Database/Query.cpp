@@ -8,7 +8,7 @@
 
 
 Query::Query(DBReq * req){
-    queryStr = "SELECT count(event_type) FROM (";
+    //queryStr = "SELECT count(event_type) FROM (";
     catStr = "";
     constrtStr = new std::deque<std::string>;
 
@@ -26,36 +26,39 @@ void Query::buildQueryFromReq(DBReq * req){
     buildConstrts(req); // Function to build in constraints from DBReq
 }
 
-//**In order to get constraints to work, I may need to structure all of the category stuff as a subquery**
-//**Then, constraints can just add on a where clause to the table returned from the subquery (and maybe what to SELECT)**
+
 void Query::buildCats(DBReq * req){
-    std::string cats[] = {"FGA", "FGM", "3PA", "3PM", "DREB", "OREB",
-                          "Steals", "Blocks", "Turnovers", "DrawnFouls",
-                          "offPlays", "defPlays"};
+    std::string cats[] = {"FGA", "FGM", "2PA", "2PM", "3PA", "3PM",
+                          "DREB", "OREB", "Steals", "Blocks", "Turnovers",
+                          "DrawnFouls", "offPlays", "defPlays"};
 
     if (req->getCategory() == cats[0]){
         buildFGA(req);
     } else if (req->getCategory() == cats[1]){
         buildFGM(req);
-    } else if (req->getCategory() == cats[2]){
-        build3PA(req);
+    } else if (req->getCategory() == cats[2]) {
+        build2PA(req);
     } else if (req->getCategory() == cats[3]){
-        build3PM(req);
+        build2PM(req);
     } else if (req->getCategory() == cats[4]){
-        buildDREB(req);
+        build3PA(req);
     } else if (req->getCategory() == cats[5]){
-        buildOREB(req);
+        build3PM(req);
     } else if (req->getCategory() == cats[6]){
-        buildSTL(req);
+        buildDREB(req);
     } else if (req->getCategory() == cats[7]){
-        buildBLK(req);
+        buildOREB(req);
     } else if (req->getCategory() == cats[8]){
-        buildTOV(req);
+        buildSTL(req);
     } else if (req->getCategory() == cats[9]){
-        buildDrawFoul(req);
+        buildBLK(req);
     } else if (req->getCategory() == cats[10]){
-        buildOffPlays(req);
+        buildTOV(req);
     } else if (req->getCategory() == cats[11]){
+        buildDrawFoul(req);
+    } else if (req->getCategory() == cats[12]){
+        buildOffPlays(req);
+    } else if (req->getCategory() == cats[13]){
         buildDefPlays(req);
     }
 }
@@ -70,6 +73,20 @@ void Query::buildFGM(DBReq * req){
     catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
     catStr += std::to_string(req->getPID());
     catStr += " AND event_type = 'shot'";
+}
+
+void Query::build2PA(DBReq * req){
+    catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+    catStr += std::to_string(req->getPID());
+    catStr += " AND (event_type = 'shot' OR event_type = 'miss')";
+    catStr += " AND three_pointer = false";
+}
+
+void Query::build2PM(DBReq * req){
+    catStr += "SELECT game_id, play_id, event_type FROM nba_shots WHERE player = ";
+    catStr += std::to_string(req->getPID());
+    catStr += " AND event_type = 'shot'";
+    catStr += " AND three_pointer = false";
 }
 
 void Query::build3PA(DBReq * req){
