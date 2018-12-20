@@ -48,6 +48,7 @@ public:
 
     // Getter
     void getPlayerRes(PlayerRes *, int);
+    double getResVal(int playerResIndex, int resValIndex);
 
     // Setter
     void addPlayerRes();

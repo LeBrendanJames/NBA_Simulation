@@ -54,8 +54,10 @@ void DBRes::getPlayerRes(PlayerRes * newPlayerRes, int resNum){
     for (int i = 0; i < this->playerRes[resNum]->getResValsSize(); i++){
         newPlayerRes->addResVal(this->playerRes[resNum]->getResVal(i));
     }
+}
 
-    return;
+double DBRes::getResVal(int playerResIndex, int resValIndex) {
+    return this->playerRes[playerResIndex]->getResVal(resValIndex);
 }
 
 // SET playerResObj
